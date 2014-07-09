@@ -1,4 +1,4 @@
-## Welcome to the Appcelerator Device Tracker project.
+## Appcelerator Device Tracker project.
 
 This project was created with the idea that we could keep track of all Appcelerator test devices.
 Each device has it's own unique QR code and each user/developer has their own unique QE code.
