@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ti:app xmlns:ti="http://ti.appcelerator.org">
+    <property name="com-appcelerator-apm-id" type="string">53a73470894b506c68000046</property>
+    <property name="acs-api-key-production" type="string">8lQXqmfgvqZk5qM5YeUSXJHD28tnp3om</property>
+    <property name="acs-authbase-url" type="string">https://secure-identity.cloud.appcelerator.com</property>
+    <property name="acs-base-url" type="string">https://api.cloud.appcelerator.com</property>
+    <property name="acs-api-key-development" type="string">2FrwFse1L3sAAVzqp8QMMb7qySOriQ6l</property>
+    <id>com.appcelerator.devicetracker</id>
+    <name>DeviceTracker</name>
+    <version>1.0</version>
+    <publisher>sdowse</publisher>
+    <url>http://</url>
+    <description>undefined</description>
+    <copyright>2014 by sdowse</copyright>
+    <icon>appicon.png</icon>
+    <fullscreen>false</fullscreen>
+    <navbar-hidden>false</navbar-hidden>
+    <analytics>true</analytics>
+    <guid>57271ede-95f5-4275-a823-ccd97040323b</guid>
+    <property name="ti.ui.defaultunit" type="string">dp</property>
+    <ios>
+        <plist>
+            <dict>
+                <key>UISupportedInterfaceOrientations~iphone</key>
+                <array>
+                    <string>UIInterfaceOrientationPortrait</string>
+                </array>
+                <key>UISupportedInterfaceOrientations~ipad</key>
+                <array>
+                    <string>UIInterfaceOrientationPortrait</string>
+                    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+                    <string>UIInterfaceOrientationLandscapeLeft</string>
+                    <string>UIInterfaceOrientationLandscapeRight</string>
+                </array>
+                <key>UIRequiresPersistentWiFi</key>
+                <false/>
+                <key>UIPrerenderedIcon</key>
+                <false/>
+                <key>UIStatusBarHidden</key>
+                <false/>
+                <key>UIStatusBarStyle</key>
+                <string>UIStatusBarStyleDefault</string>
+                <key>CFBundleURLTypes</key>
+                <array>
+                    <dict>
+                        <key>CFBundleTypeRole</key>
+                        <string>Editor</string>
+                        <key>CFBundleURLName</key>
+                        <string>com.appcelerator.devicetracker</string>
+                        <key>CFBundleURLSchemes</key>
+                        <array>
+                            <string>touchtest-e934bf14-1cbf-441e-b1d8-d91c8d657411</string>
+                        </array>
+                    </dict>
+                </array>
+            </dict>
+        </plist>
+    </ios>
+    <android xmlns:android="http://schemas.android.com/apk/res/android">
+        <manifest>
+            <application>
+                <activity
+                    android:configChanges="keyboardHidden|orientation"
+                    android:label="DeviceTracker"
+                    android:name=".DevicetrackerActivity" android:theme="@style/Theme.Titanium">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN"/>
+                        <category android:name="android.intent.category.LAUNCHER"/>
+                    </intent-filter>
+                    <intent-filter>
+                        <data android:scheme="touchtest-e934bf14-1cbf-441e-b1d8-d91c8d657411"/>
+                        <action android:name="android.intent.action.VIEW"/>
+                        <category android:name="android.intent.category.BROWSABLE"/>
+                        <category android:name="android.intent.category.DEFAULT"/>
+                    </intent-filter>
+                </activity>
+                <service android:enabled="true" android:exported="false" android:name="com.soasta.android.touchtest.TouchTestService"/>
+            </application>
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+            <uses-permission android:name="android.permission.BLUETOOTH"/>
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+            <uses-permission android:name="android.permission.GET_TASKS"/>
+        </manifest>
+    </android>
+    <mobileweb>
+        <precache/>
+        <splash>
+            <enabled>true</enabled>
+            <inline-css-images>true</inline-css-images>
+        </splash>
+        <theme>default</theme>
+    </mobileweb>
+    <modules>
+        <module platform="commonjs">ti.cloud</module>
+        <module platform="android">com.mirasense.scanditsdk</module>
+        <module platform="iphone">com.mirasense.scanditsdk</module>
+        <module platform="android">ti.cloudpush</module>
+    </modules>
+    <deployment-targets>
+        <target device="tizen">false</target>
+        <target device="android">true</target>
+        <target device="blackberry">false</target>
+        <target device="ipad">true</target>
+        <target device="iphone">true</target>
+        <target device="mobileweb">false</target>
+    </deployment-targets>
+    <sdk-version>3.3.0.v20140708132513</sdk-version>
+</ti:app>
