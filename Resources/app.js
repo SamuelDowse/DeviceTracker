@@ -250,7 +250,7 @@ function logOut(){
 //-- START OF SCANNER VIEW SECTION --\\
 
 var tabGroup =	Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00' }),
-	cameraWin =	Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'white', barColor:'#B50D00' }),
+	cameraWin =	Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'white', barColor:'#B50D00', tabBarHidden: true }),
 	deviceWin =	Ti.UI.createWindow({ title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00' }),
 	cameraTab =	Ti.UI.createTab({ title:'Scanner', icon:'assets/camera.png', window:cameraWin, backgroundSelectedColor:'white' }),
 	deviceTab =	Ti.UI.createTab({ title:'Devices', icon:'assets/device.png', window:deviceWin, backgroundSelectedColor:'white' }),
@@ -259,8 +259,10 @@ var tabGroup =	Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00' }),
 
 clear.addEventListener("click", function() { scannedDevices = []; if (Ti.Platform.osname != 'android') cameraWin.setRightNavButton(blank); });
 cameraWin.addEventListener('focus', function() { openScanner(); });
+cameraWin.addEventListener('swipe', function(e) { if (e.direction == 'left') { tabGroup.setActiveTab(1); if(admin == true) deviceWin.setRightNavButton(add); }});
 cameraWin.addEventListener('blur', function() { closeScanner(); });
-deviceWin.addEventListener('focus', function() { deviceList.setData(platforms); if(admin == true) deviceWin.setRightNavButton(add); });
+deviceWin.addEventListener('focus', function() { deviceList.setData(platforms); });
+deviceWin.addEventListener('swipe', function(e) { if (e.direction == 'right') { tabGroup.setActiveTab(0); if(admin == true) deviceWin.setRightNavButton(blank); }});
 login.addEventListener("click", function() { logIn(); });
 cameraWin.setLeftNavButton(login);
 
@@ -285,11 +287,11 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	deleteDevice = 		Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'95%', height:'10%'}),
 	deviceInfo =	 	Ti.UI.createLabel({font:{fontSize:18}, top:'50%', height:'50%'}),
 	deviceImage = 		Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
-	devicePlatformValue=Ti.UI.createTextArea({font:{fontSize:18}, top:10,clearOnEdit:true}),
-	deviceOSValue =		Ti.UI.createTextArea({font:{fontSize:18}, top:5, clearOnEdit:true}),
-	deviceModelValue =	Ti.UI.createTextArea({font:{fontSize:18}, top:5, clearOnEdit:true}),
-	deviceNameValue =	Ti.UI.createTextArea({font:{fontSize:18}, top:5, clearOnEdit:true}),
-	deviceIMEIValue =	Ti.UI.createTextArea({font:{fontSize:18}, top:5, clearOnEdit:true}),
+	devicePlatformValue=Ti.UI.createTextField({font:{fontSize:18}, top:20}),
+	deviceOSValue =		Ti.UI.createTextField({font:{fontSize:18}, top:15}),
+	deviceModelValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15}),
+	deviceNameValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15}),
+	deviceIMEIValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15}),
 	deviceIDValue;
 
 getPlatforms();
@@ -310,6 +312,7 @@ addWindow.add(deviceOSValue);
 addWindow.add(deviceModelValue);
 addWindow.add(deviceNameValue);
 addWindow.add(deviceIMEIValue);
+
 //ADD DEVICE WINDOW--\\
 
 deviceWin.add(deviceList);
@@ -341,35 +344,67 @@ backToDevice.addEventListener('singletap', function() { deviceWin.remove(editWin
 closeAddWindow.addEventListener('singletap', function() { deviceWin.remove(addWindow); deviceWin.setLeftNavButton(blank); deviceWin.setRightNavButton(add); });
 edit.addEventListener('singletap', function() { deviceWin.add(editWindow); deviceWin.setLeftNavButton(backToDevice); deviceWin.setRightNavButton(save); });
 add.addEventListener('singletap', function() {
-	devicePlatformValue.setValue("Platform");
-	deviceOSValue.setValue("OS Version");
-	deviceModelValue.setValue("Model");
-	deviceNameValue.setValue("Name");
-	deviceIMEIValue.setValue("IMEI");
+	devicePlatformValue.setHintText("Platform");
+	deviceOSValue.setHintText("OS Version");
+	deviceModelValue.setHintText("Model");
+	deviceNameValue.setHintText("Name");
+	deviceIMEIValue.setHintText("IMEI");
+	devicePlatformValue.setValue(null);
+	deviceOSValue.setValue(null);
+	deviceModelValue.setValue(null);
+	deviceNameValue.setValue(null);
+	deviceIMEIValue.setValue(null);
+	if (Ti.Media.showCamera) {
+	    var takePhoto = Ti.UI.createButton({ title:'Take Photo with Camera', top:5, font:{fontSize:18} });
+	    takePhoto.addEventListener('click', function (evt) { Ti.Media.showCamera({ success: function (e) { photo = e.media; } }); });
+	    addWindow.add(takePhoto);
+	}
 	deviceWin.add(addWindow);
 	deviceWin.setLeftNavButton(closeAddWindow);
 	deviceWin.setRightNavButton(upload);
 });
 upload.addEventListener('singletap', function() {
 	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
-		Cloud.Objects.create({
-		    classname: 'Device',
-		    acl_name: "Device",
-		    fields: {
-		        name: deviceNameValue.value,
-		        platform: devicePlatformValue.value,
-		        model: deviceModelValue.value,
-		        osver: deviceOSValue.value,
-		        imei: deviceIMEIValue.value
-		    }
-		}, function (e) {
-			if (e.success){
-				alert("Device added successfully");
-				deviceWin.remove(addWindow);
-				deviceWin.setLeftNavButton(blank);
-				deviceWin.setRightNavButton(add);
-			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-		});
+		if (photo) {
+			Cloud.Objects.create({
+			    classname: 'Device',
+			    acl_name: "Device",
+			    photo: photo,
+			    fields: {
+			        name: deviceNameValue.value,
+			        platform: devicePlatformValue.value,
+			        model: deviceModelValue.value,
+			        osver: deviceOSValue.value,
+			        imei: deviceIMEIValue.value
+			    }
+			}, function (e) {
+				if (e.success){
+					alert("Device added successfully");
+					deviceWin.remove(addWindow);
+					deviceWin.setLeftNavButton(blank);
+					deviceWin.setRightNavButton(add);
+				} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+			});
+		} else {
+			Cloud.Objects.create({
+			    classname: 'Device',
+			    acl_name: "Device",
+			    fields: {
+			        name: deviceNameValue.value,
+			        platform: devicePlatformValue.value,
+			        model: deviceModelValue.value,
+			        osver: deviceOSValue.value,
+			        imei: deviceIMEIValue.value
+			    }
+			}, function (e) {
+				if (e.success){
+					alert("Device added successfully");
+					deviceWin.remove(addWindow);
+					deviceWin.setLeftNavButton(blank);
+					deviceWin.setRightNavButton(add);
+				} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+			});
+		}
 	}
 });
 deleteDevice.addEventListener('singletap', function() {
