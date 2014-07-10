@@ -355,7 +355,7 @@ add.addEventListener('singletap', function() {
 	deviceNameValue.setValue(null);
 	deviceIMEIValue.setValue(null);
 	if (Ti.Media.showCamera) {
-	    var takePhoto = Ti.UI.createButton({ title:'Take Photo with Camera', top:5, font:{fontSize:18} });
+	    var takePhoto = Ti.UI.createButton({ title:'Take Photo with Camera', top:15, font:{fontSize:18} });
 	    takePhoto.addEventListener('click', function (evt) { Ti.Media.showCamera({ success: function (e) { photo = e.media; } }); });
 	    addWindow.add(takePhoto);
 	}

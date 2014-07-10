@@ -1,12 +1,14 @@
 ## Appcelerator Device Tracker project.
 
 This project was created with the idea that we could keep track of all Appcelerator test devices.
-Each device has it's own unique QR code and each user/developer has their own unique QE code.
+Each device has it's own unique barcode and each user/developer has their own unique barcode.
+
+The barcodes supported by the scanner are: EAN, UPC and QR codes
 
 ### How To Use:
 
 ##### To assign a device to yourself for testing:
-1. Scan your own QR code.
+1. Scan your own barcode.
 2. Scan all the devices you wish to use.
 3. Double tap the screen to assign the devices to yourself.
 
@@ -15,7 +17,7 @@ Each device has it's own unique QR code and each user/developer has their own un
 2. Double tap the screen to remove the devices from yourself.
 
 ##### If you wish to remove devices from yourself while taking out more devices:
-1. Scan your own QE code.
+1. Scan your own barcode.
 2. Scan the devices you want to return.
 3. Scan the devices you want to use.
 4. Double tap the screen to assign the devices accordingly.
@@ -28,10 +30,10 @@ Each device has it's own unique QR code and each user/developer has their own un
 4. Select the device and information about the device will be displayed.
 
 ##### If you find a device around the office that is no longer in use:
-1. If you wish to use the device, scan your QE code and then scan the device QR code, then double tap the screen.
-2. If you wish to return the device, scan the device QR code and double tap the screen.
+1. If you wish to use the device, scan your barcode and then scan the device QR code, then double tap the screen.
+2. If you wish to return the device, scan the device barcode and double tap the screen.
 
 ##### If you want to transfer a device from one user/developer to another.
-1. The user/developer who wishes to use the device scans their QR code, then scan the device QR code.
+1. The user/developer who wishes to use the device scans their barcode, then scan the device barcode.
 2. Double tap the screen.
 (The device will be removed from the old user and attached to the new user)
