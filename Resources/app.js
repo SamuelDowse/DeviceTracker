@@ -144,11 +144,11 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	deleteDevice = 		Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'50%', height:'10%'}),
 	deviceInfo =	 	Ti.UI.createLabel({font:{fontSize:18}, top:'50%', height:'50%'}),
 	deviceImage = 		Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
-	devicePlatformValue=Ti.UI.createTextField({font:{fontSize:18}, top:20}),
-	deviceOSValue =		Ti.UI.createTextField({font:{fontSize:18}, top:15}),
-	deviceModelValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15}),
-	deviceNameValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15}),
-	deviceIMEIValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15}),
+	devicePlatformValue=Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform'}),
+	deviceOSValue =		Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'OS Version'}),
+	deviceModelValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Model'}),
+	deviceNameValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Name'}),
+	deviceIMEIValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI'}),
 	deviceIDValue;
 
 getPlatforms();
@@ -248,11 +248,6 @@ edit.addEventListener('singletap', function() {
 	deviceWin.setRightNavButton(save);
 });
 add.addEventListener('singletap', function() {
-	devicePlatformValue.setHintText("Platform");
-	deviceOSValue.setHintText("OS Version");
-	deviceModelValue.setHintText("Model");
-	deviceNameValue.setHintText("Name");
-	deviceIMEIValue.setHintText("IMEI");
 	devicePlatformValue.setValue(null);
 	deviceOSValue.setValue(null);
 	deviceModelValue.setValue(null);
