@@ -5,14 +5,14 @@ var Cloud = require('ti.cloud'),
 	platforms = [], allPlatforms = [], photo = null,
 	startupAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
 	endAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
-	updated = Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0});
+	updated = Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0}),
+	blank = Ti.UI.createButton({color:'white', backgroundImage:'none'});
 
 // check for network
 if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
      var alertDialog = Titanium.UI.createAlertDialog({
 		title: 'WARNING!',
 		message: 'Your device is not online.\nThis app will not work if you aren\'t connected.',
-		buttonNames: ['OK']
 	});
 	alertDialog.show();
 }
@@ -51,12 +51,13 @@ logout.addEventListener('click', function() { logOut(); });
 function logIn(){
 	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
 		scannerFile.closeScanner();
-		var loginWindow = Ti.UI.createWindow({backgroundColor:"white", layout:"vertical"});
+		var loginWindow = Ti.UI.createView({backgroundColor:"white", layout:"vertical"});
 		var userName = Ti.UI.createTextField({top:50, autocorrect:false, hintText:'Username'});
 		var userPassword = Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password'});
-		var login = Ti.UI.createButton({title:"Log In", top:30});
-		var cancel = Ti.UI.createButton({title:"Cancel", top:30});
-		login.addEventListener("click", function() {
+		var loginButton = Ti.UI.createButton({title:"Log In", top:30});
+		var cancelButton = Ti.UI.createButton({title:"Cancel", top:30});
+		cameraWin.setLeftNavButton(blank);
+		loginButton.addEventListener("click", function() {
 			Cloud.Users.login({
 	    		login: userName.value,
 				password: userPassword.value
@@ -69,7 +70,8 @@ function logIn(){
 					});
 					loginDialog.show();
 					cameraWin.setLeftNavButton(logout);
-					loginWindow.close();
+					cameraWin.remove(loginWindow);
+					scannerFile.openScanner();
 					if (user.admin == 'true')
 						admin = true;
 	    		} else {
@@ -78,10 +80,14 @@ function logIn(){
 			});
 		});
 		loggedIn = true;
-		cancel.addEventListener("click", function() { loginWindow.close(); });
+		cancelButton.addEventListener("click", function() {
+			cameraWin.remove(loginWindow);
+			scannerFile.openScanner();
+			cameraWin.setLeftNavButton(login);
+		});
 		loginWindow.add(userName); loginWindow.add(userPassword);
-		loginWindow.add(login); loginWindow.add(cancel);
-		loginWindow.open();
+		loginWindow.add(loginButton); loginWindow.add(cancelButton);
+		cameraWin.add(loginWindow);
 	}
 }
 function logOut(){
@@ -89,7 +95,7 @@ function logOut(){
 		Cloud.Users.logout(function (e) {
 			if (e.success) {
 				var logoutDialog = Ti.UI.createAlertDialog({
-					message: 'You have been successfully logged out',
+					message: 'You have been logged out',
 					title: 'Logged Out'
 				});
 				logoutDialog.show();
@@ -133,7 +139,6 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	add = 				Ti.UI.createButton({title:'Add', color:'white', backgroundImage: 'none'}),
 	save = 				Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'}),
 	upload = 			Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'}),
-	blank = 			Ti.UI.createButton({color:'white', backgroundImage:'none'}),
 	takePhoto =			Ti.UI.createButton({ title:'Take Photo of Device', top:15, font:{fontSize:18} }),
 	search = 			Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0}),
 	control =			Ti.UI.createRefreshControl({tintColor:'red'}),
@@ -142,7 +147,7 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	addWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
 	deviceWindow = 		Ti.UI.createView({backgroundColor:'white'}),
 	deleteDevice = 		Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'50%', height:'10%'}),
-	deviceInfo =	 	Ti.UI.createLabel({font:{fontSize:18}, top:'50%', height:'50%'}),
+	deviceInfo =	 	Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%'}),
 	deviceImage = 		Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
 	devicePlatformValue=Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform'}),
 	deviceOSValue =		Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'OS Version'}),
@@ -351,7 +356,18 @@ deviceList.addEventListener('singletap', function(e){
 				        var devices = [];
 				        for (var i = 0; i < e.Device.length; i++){
 				            var device = e.Device[i];
-				            devices.push({title:device.model+' ('+device.osver+')', model:device.model, name:device.name, imei:device.imei, platform:device.platform, osver:device.osver, takenBy:device.taken_by, image:device.photo, id:device.id, color:'white'});
+				            devices.push({
+				            	title: device.model+' ('+device.osver+')',
+				            	model: device.model,
+				            	name: device.name,
+				            	imei: device.imei,
+				            	platform: device.platform,
+				            	osver: device.osver,
+				            	takenBy: device.taken_by,
+				            	image: device.photo,
+				            	id: device.id,
+				            	color: 'white'
+				            });
 				        }
 				        deviceList.setData(devices);
 				    }
@@ -366,12 +382,12 @@ deviceList.addEventListener('singletap', function(e){
 						var takenBy = a.users[0];
 			    		if (a.success){
 			    			var takenByTest = e.rowData.takenBy;
-							deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\nModel: '+e.rowData.model+'\nName: '+e.rowData.name+'\nIMEI: '+e.rowData.imei+'\nTaken By: '+takenBy.first_name+' '+takenBy.last_name);
+							deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nTaken By: '+takenBy.first_name+' '+takenBy.last_name);
 						}
 					});
 				} else {
 					var takenByTest = null;
-					deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\nModel: '+e.rowData.model+'\nName: '+e.rowData.name+'\nIMEI: '+e.rowData.imei+'\nNot In Use');
+					deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nNot In Use');
 				}
 				Cloud.Users.query({
 					where:{ id: takenByTest }
