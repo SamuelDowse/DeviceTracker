@@ -1,7 +1,10 @@
 var Cloud = require('ti.cloud'),
 	admin = false, cameraIndexField, loggedIn = false, picker,
 	scanditsdk = require('com.mirasense.scanditsdk'),
-	platforms = [], allPlatforms = [];
+	platforms = [], allPlatforms = [], photo = null,
+	startupAnimation= Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
+	endAnimation	= Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
+	updated			= Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0});
 
 // check for network
 if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
@@ -86,10 +89,12 @@ function checkoutDevice(){
 											id: device.id,
 											fields: { taken_by: null }
 										}, function (e) {
-											if (e.success)
-												alert('Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name); 
-											else 
+											if (e.success) {
+												var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name });
+												unlinkDialog.show();
+											} else { 
 												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+											}
 										});
 										break;
 									default:
@@ -98,10 +103,12 @@ function checkoutDevice(){
 											id: device.id,
 											fields: { taken_by: user.id }
 										}, function (e) {
-											if (e.success)
-												alert('Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name); 
-											else
+											if (e.success) {
+												var linkDialog = Ti.UI.createAlertDialog({message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name });
+												linkDialog.show();
+											} else {
 												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+											}
 										});
 										break;
 								}
@@ -138,10 +145,12 @@ function logCheckDevice(){
 													id: device.id,
 													fields: { taken_by:null }
 												}, function (e) {
-													if (e.success)
-														alert('Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name);
-													else
+													if (e.success) {
+														var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name });
+														unlinkDialog.show();
+													} else {
 														alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+													}
 												});
 												break;
 											default:
@@ -150,10 +159,12 @@ function logCheckDevice(){
 													id: device.id,
 													fields: { taken_by:uniqueDevices[0]}
 												}, function (e) {
-													if (e.success)
-														alert('Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name);
-													else 
+													if (e.success) {
+														var linkDialog = Ti.UI.createAlertDialog({message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name });
+														linkDialog.show();
+													} else { 
 														alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+													}
 												});
 												break;
 										}
@@ -176,10 +187,12 @@ function logCheckDevice(){
 											id: device.id,
 											fields: { taken_by:null }
 										}, function (e) {
-											if (e.success)
-												alert("Unlinking device from user");
-											else
+											if (e.success) {
+												var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unlinking Device From User' });
+												unlinkDialog.show();
+											} else {
 												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+											}
 										});
 					        		}
 					    		}
@@ -214,7 +227,11 @@ function logIn(){
 			}, function (e) {
 	    		if (e.success) {
 	        		var user = e.users[0];
-	        		alert('Welcome '+user.first_name+' '+user.last_name);
+	        		var loginDialog = Ti.UI.createAlertDialog({
+						message: 'Welcome '+user.first_name+' '+user.last_name,
+						title: 'Logged In'
+					});
+					loginDialog.show();
 					cameraWin.setLeftNavButton(logout);
 					loginWindow.close();
 					if (user.admin == 'true')
@@ -236,7 +253,11 @@ function logOut(){
 	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
 		Cloud.Users.logout(function (e) {
 			if (e.success) {
-				alert('You have been successfully logged out');
+				var logoutDialog = Ti.UI.createAlertDialog({
+					message: 'You have been successfully logged out',
+					title: 'Logged Out'
+				});
+				logoutDialog.show();
 				var user = null;
 				cameraWin.setLeftNavButton(login);
 			} else {
@@ -278,13 +299,14 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	save = 				Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'}),
 	upload = 			Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'}),
 	blank = 			Ti.UI.createButton({color:'white', backgroundImage:'none'}),
+	takePhoto =			Ti.UI.createButton({ title:'Take Photo of Device', top:15, font:{fontSize:18} }),
 	search = 			Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0}),
 	control =			Ti.UI.createRefreshControl({tintColor:'red'}),
 	deviceList = 		Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control}),
 	editWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
 	addWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
 	deviceWindow = 		Ti.UI.createView({backgroundColor:'white'}),
-	deleteDevice = 		Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'95%', height:'10%'}),
+	deleteDevice = 		Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'50%', height:'10%'}),
 	deviceInfo =	 	Ti.UI.createLabel({font:{fontSize:18}, top:'50%', height:'50%'}),
 	deviceImage = 		Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
 	devicePlatformValue=Ti.UI.createTextField({font:{fontSize:18}, top:20}),
@@ -298,12 +320,14 @@ getPlatforms();
 deviceWindow.add(deviceImage);
 deviceWindow.add(deviceInfo);
 
+takePhoto.addEventListener('click', function (evt) { Ti.Media.showCamera({ success: function (e) { photo = e.media; } }); });
 //-- EDIT DEVICE WINDOW--\\
 editWindow.add(devicePlatformValue);
 editWindow.add(deviceOSValue);
 editWindow.add(deviceModelValue);
 editWindow.add(deviceNameValue);
 editWindow.add(deviceIMEIValue);
+if (Ti.Media.showCamera) editWindow.add(takePhoto);
 editWindow.add(deleteDevice);
 //--EDIT DEVICE WINDOW--\\
 //--ADD DEVICE WINDOW--\\
@@ -312,30 +336,56 @@ addWindow.add(deviceOSValue);
 addWindow.add(deviceModelValue);
 addWindow.add(deviceNameValue);
 addWindow.add(deviceIMEIValue);
-
+if (Ti.Media.showCamera) addWindow.add(takePhoto);
 //ADD DEVICE WINDOW--\\
 
 deviceWin.add(deviceList);
 control.addEventListener('refreshstart',function(e){
-    setTimeout(function(){
-    	getPlatforms();
-        control.endRefreshing();
-    }, 2000);
+	setTimeout(function(){
+		getPlatforms();
+		control.endRefreshing();
+	}, 2000);
 });
-
 save.addEventListener('singletap', function() {
-	Cloud.Objects.update({
-		classname:'Device',
-		id:deviceIDValue,
-		fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
-	}, function (e) {
-		if (e.success){
-			alert('Saved Device Information');
-			deviceWin.remove(editWindow);
-			deviceWin.setLeftNavButton(backToDevices);
-			deviceWin.setRightNavButton(edit);
-		} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-	});
+	if(photo != null){
+		Cloud.Objects.update({
+			classname:'Device',
+			id:deviceIDValue,
+			photo: photo,
+			fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
+		}, function (e) {
+			if (e.success){
+				updated.setText('  Saved Device Information  ');
+				deviceWin.add(updated); updated.animate(startupAnimation);
+				setTimeout(function(){
+				    updated.animate(endAnimation);
+				    setTimeout(function(){ deviceWin.remove(updated); },2000);
+				}, 2000);
+				deviceWin.remove(editWindow);
+				deviceWin.setLeftNavButton(backToDevices);
+				deviceWin.setRightNavButton(edit);
+			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		});
+		photo = null;
+	} else {
+		 Cloud.Objects.update({
+			classname:'Device',
+			id:deviceIDValue,
+			fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
+		}, function (e) {
+			if (e.success){
+				updated.setText('  Saved Device Information  ');
+				deviceWin.add(updated); updated.animate(startupAnimation);
+				setTimeout(function(){
+				    updated.animate(endAnimation);
+				    setTimeout(function(){ deviceWin.remove(updated); },2000);
+				}, 2000);
+				deviceWin.remove(editWindow);
+				deviceWin.setLeftNavButton(backToDevices);
+				deviceWin.setRightNavButton(edit);
+			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		});
+	}
 });
 
 backToPlatforms.addEventListener('singletap', function() { deviceList.setData(platforms); deviceWin.setLeftNavButton(blank); if(admin == true) deviceWin.setRightNavButton(add); });
@@ -354,18 +404,13 @@ add.addEventListener('singletap', function() {
 	deviceModelValue.setValue(null);
 	deviceNameValue.setValue(null);
 	deviceIMEIValue.setValue(null);
-	if (Ti.Media.showCamera) {
-	    var takePhoto = Ti.UI.createButton({ title:'Take Photo with Camera', top:15, font:{fontSize:18} });
-	    takePhoto.addEventListener('click', function (evt) { Ti.Media.showCamera({ success: function (e) { photo = e.media; } }); });
-	    addWindow.add(takePhoto);
-	}
 	deviceWin.add(addWindow);
 	deviceWin.setLeftNavButton(closeAddWindow);
 	deviceWin.setRightNavButton(upload);
 });
 upload.addEventListener('singletap', function() {
 	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
-		if (photo) {
+		if (photo != null) {
 			Cloud.Objects.create({
 			    classname: 'Device',
 			    acl_name: "Device",
@@ -379,12 +424,18 @@ upload.addEventListener('singletap', function() {
 			    }
 			}, function (e) {
 				if (e.success){
-					alert("Device added successfully");
+					updated.setText('  Device Added Successfully  ');
+					deviceWin.add(updated); updated.animate(startupAnimation);
+					setTimeout(function(){
+					    updated.animate(endAnimation);
+					    setTimeout(function(){ deviceWin.remove(updated); },2000);
+					}, 2000);
 					deviceWin.remove(addWindow);
 					deviceWin.setLeftNavButton(blank);
 					deviceWin.setRightNavButton(add);
 				} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 			});
+			photo = null;
 		} else {
 			Cloud.Objects.create({
 			    classname: 'Device',
@@ -398,7 +449,12 @@ upload.addEventListener('singletap', function() {
 			    }
 			}, function (e) {
 				if (e.success){
-					alert("Device added successfully");
+					updated.setText('  Device Added Successfully  ');
+					deviceWin.add(updated); updated.animate(startupAnimation);
+					setTimeout(function(){
+					    updated.animate(endAnimation);
+					    setTimeout(function(){ deviceWin.remove(updated); },2000);
+					}, 2000);
 					deviceWin.remove(addWindow);
 					deviceWin.setLeftNavButton(blank);
 					deviceWin.setRightNavButton(add);
@@ -419,7 +475,12 @@ deleteDevice.addEventListener('singletap', function() {
 		        deviceWin.remove(deviceWindow);
 				deviceWin.setLeftNavButton(blank);
 				deviceWin.setRightNavButton(add);
-				alert("Device successfully removed");
+				updated.setText('  Device Successfully Removed  ');
+				deviceWin.add(updated); updated.animate(startupAnimation);
+				setTimeout(function(){
+				    updated.animate(endAnimation);
+				    setTimeout(function(){ deviceWin.remove(updated); },2000);
+				}, 2000);
 		    } else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 		});
 	}
