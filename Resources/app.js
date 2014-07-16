@@ -2,9 +2,9 @@ var Cloud = require('ti.cloud'),
 	admin = false, cameraIndexField, loggedIn = false, picker,
 	scanditsdk = require('com.mirasense.scanditsdk'),
 	platforms = [], allPlatforms = [], photo = null,
-	startupAnimation= Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
-	endAnimation	= Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
-	updated			= Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0});
+	startupAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
+	endAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
+	updated = Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0});
 
 // check for network
 if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
@@ -513,34 +513,33 @@ deviceList.addEventListener('singletap', function(e){
 				if(admin == true) deviceWin.setRightNavButton(edit);
 				if (e.rowData.takenBy != undefined){
 					Cloud.Users.query({
-					    where:{ id: e.rowData.takenBy }
+						where:{ id: e.rowData.takenBy }
 					}, function (a) {
 						var takenBy = a.users[0];
-					    if (a.success){
-							if (e.rowData.image != null){ var deviceImageURL = e.rowData.image.urls['original']; } else { var deviceImageURL = "assets/nodevice.png"; }
-					   		deviceImage.setImage(deviceImageURL);
-					   		deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\nModel: '+e.rowData.model+'\nName: '+e.rowData.name+'\nIMEI: '+e.rowData.imei+'\nTaken By: '+takenBy.first_name+' '+takenBy.last_name);
-					   		devicePlatformValue.setValue(e.rowData.platform);
-					   		deviceOSValue.setValue(e.rowData.osver);
-					   		deviceModelValue.setValue(e.rowData.model);
-					   		deviceNameValue.setValue(e.rowData.name);
-					   		deviceIMEIValue.setValue(e.rowData.imei);
-					   		deviceIDValue = e.rowData.id;
-							deviceWin.add(deviceWindow);
+			    		if (a.success){
+			    			var takenByTest = e.rowData.takenBy;
+							deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\nModel: '+e.rowData.model+'\nName: '+e.rowData.name+'\nIMEI: '+e.rowData.imei+'\nTaken By: '+takenBy.first_name+' '+takenBy.last_name);
 						}
 					});
 				} else {
-					if (e.rowData.image != null){ var deviceImageURL = e.rowData.image.urls["original"]; } else { var deviceImageURL = "assets/nodevice.png"; }
-					deviceImage.setImage(deviceImageURL);
+					var takenByTest = null;
 					deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\nModel: '+e.rowData.model+'\nName: '+e.rowData.name+'\nIMEI: '+e.rowData.imei+'\nNot In Use');
-					devicePlatformValue.setValue(e.rowData.platform);
-			   		deviceOSValue.setValue(e.rowData.osver);
-			   		deviceModelValue.setValue(e.rowData.model);
-			   		deviceNameValue.setValue(e.rowData.name);
-			   		deviceIMEIValue.setValue(e.rowData.imei);
-			   		deviceIDValue = e.rowData.id;
-					deviceWin.add(deviceWindow);
 				}
+				Cloud.Users.query({
+					where:{ id: takenByTest }
+				}, function (a) {
+				    if (a.success){
+				    	var deviceImageURL = ((e.rowData.image != null) ? e.rowData.image.urls['original'] : "assets/nodevice.png");
+				   		deviceImage.setImage(deviceImageURL);
+				   		devicePlatformValue.setValue(e.rowData.platform);
+				   		deviceOSValue.setValue(e.rowData.osver);
+				   		deviceModelValue.setValue(e.rowData.model);
+				   		deviceNameValue.setValue(e.rowData.name);
+				   		deviceIMEIValue.setValue(e.rowData.imei);
+				   		deviceIDValue = e.rowData.id;
+						deviceWin.add(deviceWindow);
+					}
+				});
 			}
 		}
 	}
