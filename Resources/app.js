@@ -136,10 +136,10 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	backToDevice = 		Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
 	closeAddWindow = 	Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
 	edit = 				Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'}),
-	add = 				Ti.UI.createButton({title:'Add', color:'white', backgroundImage: 'none'}),
+	add = 				Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'}),
 	save = 				Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'}),
 	upload = 			Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'}),
-	takePhoto =			Ti.UI.createButton({ title:'Take Photo of Device', top:15, font:{fontSize:18} }),
+	takePhoto =			Ti.UI.createButton({title:'Take Photo of Device', top:15, font:{fontSize:18}}),
 	search = 			Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0}),
 	control =			Ti.UI.createRefreshControl({tintColor:'red'}),
 	deviceList = 		Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control}),
@@ -159,7 +159,24 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 getPlatforms();
 deviceWindow.add(deviceImage);
 deviceWindow.add(deviceInfo);
-takePhoto.addEventListener('click', function (evt) { Ti.Media.showCamera({ success: function (e) { photo = e.media; } });});
+takePhoto.addEventListener('click', function (evt){
+	Ti.Media.showCamera({
+		success:function(e){
+			photo = e.media;
+		},
+		cancel:function(){
+			//called when user presses cancel
+		},
+		error:function(error){
+			var a = Titanium.UI.createAlertDialog({title:'Camera'});
+			if (error.code == Titanium.Media.NO_CAMERA)
+				a.setMessage('Please run this test on device');
+			else
+				a.setMessage('Unexpected error: ' + error.code);
+			a.show();
+		}
+	});
+});
 
 //-- EDIT DEVICE WINDOW--\\
 editWindow.add(devicePlatformValue);
@@ -167,7 +184,7 @@ editWindow.add(deviceOSValue);
 editWindow.add(deviceModelValue);
 editWindow.add(deviceNameValue);
 editWindow.add(deviceIMEIValue);
-if (Ti.Media.showCamera) editWindow.add(takePhoto);
+editWindow.add(takePhoto);
 editWindow.add(deleteDevice);
 //--EDIT DEVICE WINDOW--\\
 //--ADD DEVICE WINDOW--\\
@@ -176,7 +193,7 @@ addWindow.add(deviceOSValue);
 addWindow.add(deviceModelValue);
 addWindow.add(deviceNameValue);
 addWindow.add(deviceIMEIValue);
-if (Ti.Media.showCamera) addWindow.add(takePhoto);
+addWindow.add(takePhoto);
 //ADD DEVICE WINDOW--\\
 
 deviceWin.add(deviceList);
@@ -187,50 +204,33 @@ control.addEventListener('refreshstart',function(e){
 	}, 2000);
 });
 save.addEventListener('singletap', function() {
-	if(photo != null){
-		Cloud.Objects.update({
-			classname:'Device',
-			id:deviceIDValue,
-			photo: photo,
-			fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
-		}, function (e) {
-			if (e.success){
-				updated.setText('  Saved Device Information  ');
-				deviceWin.add(updated); updated.animate(startupAnimation);
-				setTimeout(function(){
-				    updated.animate(endAnimation);
-				    setTimeout(function(){ deviceWin.remove(updated); },2000);
-				}, 2000);
-				deviceWin.remove(editWindow);
-				deviceWin.setLeftNavButton(backToDevices);
-				deviceWin.setRightNavButton(edit);
-			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-		});
-		photo = null;
-	} else {
-		 Cloud.Objects.update({
-			classname:'Device',
-			id:deviceIDValue,
-			fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
-		}, function (e) {
-			if (e.success){
-				updated.setText('  Saved Device Information  ');
-				deviceWin.add(updated); updated.animate(startupAnimation);
-				setTimeout(function(){
-				    updated.animate(endAnimation);
-				    setTimeout(function(){ deviceWin.remove(updated); },2000);
-				}, 2000);
-				deviceWin.remove(editWindow);
-				deviceWin.setLeftNavButton(backToDevices);
-				deviceWin.setRightNavButton(edit);
-			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-		});
-	}
+	Cloud.Objects.update({
+		classname:'Device',
+		id:deviceIDValue,
+		photo: photo,
+		fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
+	}, function (e) {
+		if (e.success){
+			updated.setText('  Saved Device Information  ');
+			deviceWin.add(updated); updated.animate(startupAnimation);
+			setTimeout(function(){
+			    updated.animate(endAnimation);
+			    setTimeout(function(){ deviceWin.remove(updated); },2000);
+			}, 2000);
+			deviceWin.remove(editWindow);
+			deviceWin.setLeftNavButton(backToDevices);
+			deviceWin.setRightNavButton(edit);
+		} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+	});
+	photo = null;
 });
 backToPlatforms.addEventListener('singletap', function() {
 	deviceList.setData(platforms);
 	deviceWin.setLeftNavButton(blank);
-	if(admin == true) deviceWin.setRightNavButton(add);
+	if(admin == true)
+		deviceWin.setRightNavButton(add);
+	else
+		deviceWin.setRightNavButton(blank);
 });
 backToDevices.addEventListener('singletap', function() {
 	deviceWin.remove(deviceWindow);
@@ -240,7 +240,10 @@ backToDevices.addEventListener('singletap', function() {
 backToDevice.addEventListener('singletap', function() {
 	deviceWin.remove(editWindow);
 	deviceWin.setLeftNavButton(backToDevices);
-	deviceWin.setRightNavButton(edit);
+	if(admin == true)
+		deviceWin.setRightNavButton(add);
+	else
+		deviceWin.setRightNavButton(blank);
 });
 closeAddWindow.addEventListener('singletap', function() {
 	deviceWin.remove(addWindow);
