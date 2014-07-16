@@ -12,7 +12,7 @@ The barcodes supported by the scanner are: EAN, UPC and QR codes
 2. Scan all the devices you wish to use.
 3. Double tap the screen to assign the devices to yourself.
 
-##### To remove a device form yourself:
+##### To remove a device from yourself:
 1. Scan the devices you wish to return to the device cabinet.
 2. Double tap the screen to remove the devices from yourself.
 
@@ -33,7 +33,14 @@ The barcodes supported by the scanner are: EAN, UPC and QR codes
 1. If you wish to use the device, scan your barcode and then scan the device QR code, then double tap the screen.
 2. If you wish to return the device, scan the device barcode and double tap the screen.
 
-##### If you want to transfer a device from one user/developer to another.
+##### If you want to transfer a device from one user/developer to another:
 1. The user/developer who wishes to use the device scans their barcode, then scan the device barcode.
 2. Double tap the screen.
 (The device will be removed from the old user and attached to the new user)
+
+##### If you have lost your unique barcode:
+1. Log in using the 'Log In' button.
+2. Scan the devices you wish to use.
+3. Double tap the screen to assign the devices accordingly.
+4. Log out using the 'Log Out' button.
+5. Request a new barcode from your Administrator.
