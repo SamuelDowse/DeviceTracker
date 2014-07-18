@@ -1,12 +1,12 @@
+Titanium.UI.setBackgroundColor('#484850');
 var Cloud = require('ti.cloud'),
 	scannerFile = require('scannerFile'),
-	admin = false, cameraIndexField, loggedIn = false, picker,
 	scanditsdk = require('com.mirasense.scanditsdk'),
-	platforms = [], allPlatforms = [], photo = null,
 	startupAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
 	endAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
 	updated = Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0}),
-	blank = Ti.UI.createButton({color:'white', backgroundImage:'none'});
+	blank = Ti.UI.createButton({color:'white', backgroundImage:'none'}),
+	admin = false, cameraIndexField, loggedIn = false, allPlatforms = [], photo = null, currentPlatforms = [];
 
 // check for network
 if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
@@ -21,26 +21,21 @@ function getPlatforms() {
 	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){	
 		platforms = []; 
 		Cloud.Objects.query({
-			classname: 'Device',
-			order:'platform',
-			per_page:500,
-			sel:'{"all":["platform"]}'
+			classname: 'Platforms',
+			order:'platform'
 		}, function (e) {
-			for (var i = 0; i < e.Device.length; i++) {
-				var device = e.Device[i];
-				if (e.success) allPlatforms.push(device.platform);
-			}
-			platformTypes = allPlatforms.filter(function(elem, pos) { return allPlatforms.indexOf(elem) == pos; });
-			for (var i = 0; i < platformTypes.length; i++) {
-				var platformType = platformTypes[i];
+			for (var i = 0; i < e.Platforms.length; i++) {
+				var devPlat = e.Platforms[i];
 				if (e.success){
-					platforms.push({title:platformType, name:platformType, color:'white', platform:true});
+					platforms.push({title:devPlat.platform, name:devPlat.platform, color:'white', platform:true});
+					currentPlatforms.push(devPlat.platform);
 					deviceList.setData(platforms);
 				}
 			}
 		});
 	}
 }
+getPlatforms();
 	
 var login = Ti.UI.createButton({ title:'Log In', color:'white', backgroundImage: 'none' }),
 	logout = Ti.UI.createButton({ title:'Log Out', color:'white', backgroundImage: 'none' });
@@ -111,8 +106,8 @@ function logOut(){
 
 //-- START OF SCANNER VIEW SECTION --\\
 
-var tabGroup =	Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00' }),
-	cameraWin =	Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'white', barColor:'#B50D00', tabBarHidden: true }),
+var tabGroup =	Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00', backgroundColor:'#484850' }),
+	cameraWin =	Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden: true }),
 	deviceWin =	Ti.UI.createWindow({ title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00' }),
 	cameraTab =	Ti.UI.createTab({ title:'Scanner', icon:'assets/camera.png', window:cameraWin, backgroundSelectedColor:'white' }),
 	deviceTab =	Ti.UI.createTab({ title:'Devices', icon:'assets/device.png', window:deviceWin, backgroundSelectedColor:'white' }),
@@ -141,7 +136,7 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	upload = 			Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'}),
 	takePhoto =			Ti.UI.createButton({title:'Take Photo of Device', top:15, font:{fontSize:18}}),
 	search = 			Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0}),
-	control =			Ti.UI.createRefreshControl({tintColor:'red'}),
+	control =			Ti.UI.createRefreshControl({tintColor:'#B50D00'}),
 	deviceList = 		Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control}),
 	editWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
 	addWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
@@ -156,7 +151,6 @@ var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgrou
 	deviceIMEIValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI'}),
 	deviceIDValue;
 
-getPlatforms();
 deviceWindow.add(deviceImage);
 deviceWindow.add(deviceInfo);
 takePhoto.addEventListener('click', function (evt){
@@ -168,9 +162,9 @@ takePhoto.addEventListener('click', function (evt){
 			//called when user presses cancel
 		},
 		error:function(error){
-			var a = Titanium.UI.createAlertDialog({title:'Camera'});
+			var a = Titanium.UI.createAlertDialog({title:'Error Occurred'});
 			if (error.code == Titanium.Media.NO_CAMERA)
-				a.setMessage('Please run this test on device');
+				a.setMessage('This device does not a functioning camera');
 			else
 				a.setMessage('Unexpected error: ' + error.code);
 			a.show();
@@ -208,7 +202,13 @@ save.addEventListener('singletap', function() {
 		classname:'Device',
 		id:deviceIDValue,
 		photo: photo,
-		fields:{platform:devicePlatformValue.value,osver:deviceOSValue.value,model:deviceModelValue.value,name:deviceNameValue.value,imei:deviceIMEIValue.value}
+		fields:{
+			platform:devicePlatformValue.value,
+			osver:deviceOSValue.value,
+			model:deviceModelValue.value,
+			name:deviceNameValue.value,
+			imei:deviceIMEIValue.value
+		}
 	}, function (e) {
 		if (e.success){
 			updated.setText('  Saved Device Information  ');
@@ -240,10 +240,7 @@ backToDevices.addEventListener('singletap', function() {
 backToDevice.addEventListener('singletap', function() {
 	deviceWin.remove(editWindow);
 	deviceWin.setLeftNavButton(backToDevices);
-	if(admin == true)
-		deviceWin.setRightNavButton(add);
-	else
-		deviceWin.setRightNavButton(blank);
+	deviceWin.setRightNavButton(edit);
 });
 closeAddWindow.addEventListener('singletap', function() {
 	deviceWin.remove(addWindow);
@@ -256,67 +253,43 @@ edit.addEventListener('singletap', function() {
 	deviceWin.setRightNavButton(save);
 });
 add.addEventListener('singletap', function() {
-	devicePlatformValue.setValue(null);
-	deviceOSValue.setValue(null);
-	deviceModelValue.setValue(null);
-	deviceNameValue.setValue(null);
-	deviceIMEIValue.setValue(null);
-	deviceWin.add(addWindow);
+	devicePlatformValue.setValue(null); deviceOSValue.setValue(null);
+	deviceModelValue.setValue(null); deviceNameValue.setValue(null);
+	deviceIMEIValue.setValue(null); deviceWin.add(addWindow);
 	deviceWin.setLeftNavButton(closeAddWindow);
 	deviceWin.setRightNavButton(upload);
 });
 upload.addEventListener('singletap', function() {
 	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
-		if (photo != null) {
+		Cloud.Objects.create({
+			classname:'Device',
+			acl_name: 'Device',
+			photo: photo,
+			fields: {
+		        name:deviceNameValue.value,
+		        platform:devicePlatformValue.value,
+		        model:deviceModelValue.value,
+		        osver:deviceOSValue.value,
+		        imei:deviceIMEIValue.value
+		    }
+		}, function (e) {
+			if (e.success){
+				updated.setText('  Device Added Successfully  ');
+				deviceWin.add(updated); updated.animate(startupAnimation);
+				setTimeout(function(){
+				    updated.animate(endAnimation);
+				    setTimeout(function(){ deviceWin.remove(updated); },2000);
+				}, 2000);
+				deviceWin.remove(addWindow);
+				deviceWin.setLeftNavButton(blank);
+				deviceWin.setRightNavButton(add);
+			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		});
+		photo = null;
+		if ( !currentPlatforms.indexOf(devicePlatformValue.value) > -1 ){
 			Cloud.Objects.create({
-			    classname: 'Device',
-			    acl_name: "Device",
-			    photo: photo,
-			    fields: {
-			        name: deviceNameValue.value,
-			        platform: devicePlatformValue.value,
-			        model: deviceModelValue.value,
-			        osver: deviceOSValue.value,
-			        imei: deviceIMEIValue.value
-			    }
-			}, function (e) {
-				if (e.success){
-					updated.setText('  Device Added Successfully  ');
-					deviceWin.add(updated); updated.animate(startupAnimation);
-					setTimeout(function(){
-					    updated.animate(endAnimation);
-					    setTimeout(function(){ deviceWin.remove(updated); },2000);
-					}, 2000);
-					deviceWin.remove(addWindow);
-					deviceWin.setLeftNavButton(blank);
-					deviceWin.setRightNavButton(add);
-				} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-			});
-			photo = null;
-		} else {
-			Cloud.Objects.create({
-			    classname: 'Device',
-			    acl_name: "Device",
-			    fields: {
-			        name: deviceNameValue.value,
-			        platform: devicePlatformValue.value,
-			        model: deviceModelValue.value,
-			        osver: deviceOSValue.value,
-			        imei: deviceIMEIValue.value
-			    }
-			}, function (e) {
-				if (e.success){
-					updated.setText('  Device Added Successfully  ');
-					deviceWin.add(updated); updated.animate(startupAnimation);
-					setTimeout(function(){
-					    updated.animate(endAnimation);
-					    setTimeout(function(){ deviceWin.remove(updated); },2000);
-					}, 2000);
-					deviceWin.remove(addWindow);
-					deviceWin.setLeftNavButton(blank);
-					deviceWin.setRightNavButton(add);
-				} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-			});
+				classname:'Platforms',fields:{platform:devicePlatformValue.value}
+			}, function (e) { if (!e.success) alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); });
 		}
 	}
 });
@@ -327,7 +300,6 @@ deleteDevice.addEventListener('singletap', function() {
 		    id: deviceIDValue
 		}, function (e) {
 		    if (e.success) {
-		    	getPlatforms();
 		        deviceWin.remove(editWindow);
 		        deviceWin.remove(deviceWindow);
 				deviceWin.setLeftNavButton(blank);
@@ -395,8 +367,8 @@ deviceList.addEventListener('singletap', function(e){
 				Cloud.Users.query({
 					where:{ id: takenByTest }
 				}, function (a) {
-				    if (a.success){
-				    	var deviceImageURL = ((e.rowData.image != null) ? e.rowData.image.urls['original'] : "assets/nodevice.png");
+				    if (a.success){    
+					    var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
 				   		deviceImage.setImage(deviceImageURL);
 				   		devicePlatformValue.setValue(e.rowData.platform);
 				   		deviceOSValue.setValue(e.rowData.osver);

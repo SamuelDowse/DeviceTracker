@@ -1,8 +1,8 @@
-#appname: DeviceTracker
-#publisher: sdowse
-#url: http://
-#image: appicon.png
-#appid: com.appcelerator.devicetracker
-#desc: undefined
-#type: ipad
-#guid: 57271ede-95f5-4275-a823-ccd97040323b
+#appname:DeviceTracker
+#publisher:sdowse
+#url:http://
+#image:appicon.png
+#appid:com.appcelerator.devicetracker
+#desc:Device Tracker
+#type:ipad
+#guid:57271ede-95f5-4275-a823-ccd97040323b
