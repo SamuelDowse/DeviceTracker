@@ -163,10 +163,7 @@ takePhoto.addEventListener('click', function (evt){
 		},
 		error:function(error){
 			var a = Titanium.UI.createAlertDialog({title:'Error Occurred'});
-			if (error.code == Titanium.Media.NO_CAMERA)
-				a.setMessage('This device does not a functioning camera');
-			else
-				a.setMessage('Unexpected error: ' + error.code);
+			((error.code == Titanium.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: ' + error.code));
 			a.show();
 		}
 	});
