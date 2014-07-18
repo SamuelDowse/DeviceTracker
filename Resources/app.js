@@ -299,8 +299,8 @@ deleteDevice.addEventListener('singletap', function() {
 		    if (e.success) {
 		        deviceWin.remove(editWindow);
 		        deviceWin.remove(deviceWindow);
-				deviceWin.setLeftNavButton(blank);
-				deviceWin.setRightNavButton(add);
+				deviceWin.setLeftNavButton(backToPlatforms);
+				deviceWin.setRightNavButton(blank);
 				updated.setText('  Device Successfully Removed  ');
 				deviceWin.add(updated); updated.animate(startupAnimation);
 				setTimeout(function(){
