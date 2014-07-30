@@ -1,12 +1,11 @@
 Titanium.UI.setBackgroundColor('#484850');
-var Cloud = require('ti.cloud'),
-	scannerFile = require('scannerFile'),
-	scanditsdk = require('com.mirasense.scanditsdk'),
+var Cloud = require('ti.cloud'), scannerFile = require('scannerFile'),
+	scanditsdk = require('com.mirasense.scanditsdk'), cameraIndexField,
 	startupAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
 	endAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
 	updated = Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0}),
 	blank = Ti.UI.createButton({color:'white', backgroundImage:'none'}),
-	admin = false, cameraIndexField, loggedIn = false, allPlatforms = [], photo = null, currentPlatforms = [];
+	admin = false, loggedIn = false, photo = null, allPlatforms = [], currentPlatforms = [];
 
 // check for network
 if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
@@ -158,9 +157,7 @@ takePhoto.addEventListener('click', function (evt){
 		success:function(e){
 			photo = e.media;
 		},
-		cancel:function(){
-			//called when user presses cancel
-		},
+		cancel:function(){},
 		error:function(error){
 			var a = Titanium.UI.createAlertDialog({title:'Error Occurred'});
 			((error.code == Titanium.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: ' + error.code));
@@ -283,7 +280,9 @@ upload.addEventListener('singletap', function() {
 			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 		});
 		photo = null;
-		if ( !currentPlatforms.indexOf(devicePlatformValue.value) > -1 ){
+		if ( currentPlatforms.indexOf(devicePlatformValue.value) > -1 ){
+			Ti.API.info("OS already exists, ignoring creation of OS in ACS");
+		} else {
 			Cloud.Objects.create({
 				classname:'Platforms',fields:{platform:devicePlatformValue.value}
 			}, function (e) { if (!e.success) alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); });
