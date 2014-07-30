@@ -26,7 +26,7 @@ function getPlatforms() {
 			for (var i = 0; i < e.Platforms.length; i++) {
 				var devPlat = e.Platforms[i];
 				if (e.success){
-					platforms.push({title:devPlat.platform, name:devPlat.platform, color:'white', platform:true});
+					platforms.push({title:devPlat.platform, name:devPlat.platform, color:'white', platform:true, id:devPlat.id});
 					currentPlatforms.push(devPlat.platform);
 					deviceList.setData(platforms);
 				}
@@ -105,19 +105,19 @@ function logOut(){
 
 //-- START OF SCANNER VIEW SECTION --\\
 
-var tabGroup =	Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00', backgroundColor:'#484850' }),
-	cameraWin =	Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden: true }),
-	deviceWin =	Ti.UI.createWindow({ title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00' }),
-	cameraTab =	Ti.UI.createTab({ title:'Scanner', icon:'assets/camera.png', window:cameraWin, backgroundSelectedColor:'white' }),
-	deviceTab =	Ti.UI.createTab({ title:'Devices', icon:'assets/device.png', window:deviceWin, backgroundSelectedColor:'white' }),
-	login =		Ti.UI.createButton({ title:"Log In", color:"white", backgroundImage: 'none' }),
-	clear =		Ti.UI.createButton({ title:"Clear", color:"white", backgroundImage: 'none' });
+var tabGroup	= Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00', backgroundColor:'#484850' }),
+	cameraWin	= Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden: true }),
+	deviceWin	= Ti.UI.createWindow({ title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00' }),
+	cameraTab	= Ti.UI.createTab({ title:'Scanner', icon:'assets/camera.png', window:cameraWin, backgroundSelectedColor:'white' }),
+	deviceTab	= Ti.UI.createTab({ title:'Devices', icon:'assets/device.png', window:deviceWin, backgroundSelectedColor:'white' }),
+	login		= Ti.UI.createButton({ title:"Log In", color:"white", backgroundImage: 'none' }),
+	clear		= Ti.UI.createButton({ title:"Clear", color:"white", backgroundImage: 'none' });
 
 clear.addEventListener("click", function() { scannedDevices = []; if (Ti.Platform.osname != 'android') cameraWin.setRightNavButton(blank); });
 cameraWin.addEventListener('focus', function() { scannerFile.openScanner(); });
 cameraWin.addEventListener('blur', function() { scannerFile.closeScanner(); });
 cameraWin.addEventListener('swipe', function(e) { if (e.direction == 'left') { tabGroup.setActiveTab(1); if(admin == true) deviceWin.setRightNavButton(add); }});
-deviceWin.addEventListener('focus', function() { deviceList.setData(platforms); });
+deviceWin.addEventListener('focus', function() { deviceList.setData(platforms); deviceWin.setLeftNavButton(blank); });
 deviceWin.addEventListener('swipe', function(e) { if (e.direction == 'right') { tabGroup.setActiveTab(0); if(admin == true) deviceWin.setRightNavButton(blank); }});
 login.addEventListener("click", function() { logIn(); });
 cameraWin.setLeftNavButton(login);
@@ -125,29 +125,29 @@ cameraWin.setLeftNavButton(login);
 //-- END OF SCANNER VIEW SECTION --\\
 //-- START OF DEVICE TABLE SECTION --\\
 
-var backToPlatforms = 	Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
-	backToDevices = 	Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
-	backToDevice = 		Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
-	closeAddWindow = 	Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
-	edit = 				Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'}),
-	add = 				Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'}),
-	save = 				Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'}),
-	upload = 			Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'}),
-	takePhoto =			Ti.UI.createButton({title:'Take Photo of Device', top:15, font:{fontSize:18}}),
-	search = 			Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0}),
-	control =			Ti.UI.createRefreshControl({tintColor:'#B50D00'}),
-	deviceList = 		Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control}),
-	editWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
-	addWindow = 		Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
-	deviceWindow = 		Ti.UI.createView({backgroundColor:'white'}),
-	deleteDevice = 		Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'50%', height:'10%'}),
-	deviceInfo =	 	Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%'}),
-	deviceImage = 		Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
-	devicePlatformValue=Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform'}),
-	deviceOSValue =		Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'OS Version'}),
-	deviceModelValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Model'}),
-	deviceNameValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Name'}),
-	deviceIMEIValue =	Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI'}),
+var backToPlatforms		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
+	backToDevices		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
+	backToDevice		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
+	closeAddWindow		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'}),
+	edit				= Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'}),
+	add					= Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'}),
+	save				= Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'}),
+	upload				= Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'}),
+	takePhoto			= Ti.UI.createButton({title:'Take Photo of Device', top:15, font:{fontSize:18}}),
+	search				= Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0}),
+	control				= Ti.UI.createRefreshControl({tintColor:'#B50D00'}),
+	deviceList			= Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control}),
+	editWindow			= Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
+	addWindow			= Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
+	deviceWindow		= Ti.UI.createView({backgroundColor:'white'}),
+	deleteDevice		= Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'50%', height:'10%'}),
+	deviceInfo			= Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%'}),
+	deviceImage			= Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
+	devicePlatformValue	= Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform'}),
+	deviceOSValue		= Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'OS Version'}),
+	deviceModelValue	= Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Model'}),
+	deviceNameValue		= Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Name'}),
+	deviceIMEIValue		= Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI'}),
 	deviceIDValue;
 
 deviceWindow.add(deviceImage);
@@ -159,8 +159,8 @@ takePhoto.addEventListener('click', function (evt){
 		},
 		cancel:function(){},
 		error:function(error){
-			var a = Titanium.UI.createAlertDialog({title:'Error Occurred'});
-			((error.code == Titanium.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: ' + error.code));
+			var a = Ti.UI.createAlertDialog({title:'Error Occurred'});
+			((error.code == Ti.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: ' + error.code));
 			a.show();
 		}
 	});
@@ -254,7 +254,7 @@ add.addEventListener('singletap', function() {
 	deviceWin.setRightNavButton(upload);
 });
 upload.addEventListener('singletap', function() {
-	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
+	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Objects.create({
 			classname:'Device',
 			acl_name: 'Device',
@@ -284,13 +284,13 @@ upload.addEventListener('singletap', function() {
 			Ti.API.info("OS already exists, ignoring creation of OS in ACS");
 		} else {
 			Cloud.Objects.create({
-				classname:'Platforms',fields:{platform:devicePlatformValue.value}
+				classname:'Platforms',acl_name:'Device',fields:{platform:devicePlatformValue.value}
 			}, function (e) { if (!e.success) alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); });
 		}
 	}
 });
 deleteDevice.addEventListener('singletap', function() {
-	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
+	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Objects.remove({
 		    classname: 'Device',
 		    id: deviceIDValue
@@ -311,7 +311,7 @@ deleteDevice.addEventListener('singletap', function() {
 	}
 });
 deviceList.addEventListener('singletap', function(e){
-	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
+	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		if (e.rowData != null){
 			if (e.rowData.platform == true){
 				deviceWin.setLeftNavButton(blank);
@@ -352,16 +352,16 @@ deviceList.addEventListener('singletap', function(e){
 					}, function (a) {
 						var takenBy = a.users[0];
 			    		if (a.success){
-			    			var takenByTest = e.rowData.takenBy;
+			    			var takenByID = e.rowData.takenBy;
 							deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nTaken By: '+takenBy.first_name+' '+takenBy.last_name);
 						}
 					});
 				} else {
-					var takenByTest = null;
+					var takenByID = null;
 					deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nNot In Use');
 				}
 				Cloud.Users.query({
-					where:{ id: takenByTest }
+					where:{ id: takenByID }
 				}, function (a) {
 				    if (a.success){    
 					    var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
@@ -375,6 +375,41 @@ deviceList.addEventListener('singletap', function(e){
 						deviceWin.add(deviceWindow);
 					}
 				});
+			}
+		}
+	}
+});
+deviceList.addEventListener('longpress', function(e){
+	var platformToRemove = e.rowData.id;
+	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
+		if (e.rowData != null){
+			if (e.rowData.platform == true){
+				if(admin == true){
+					var dialog = Ti.UI.createAlertDialog({
+						cancel: 1,
+						buttonNames: ['Confirm', 'Cancel'],
+						message: 'Would you like to delete this OS?',
+						title: 'Delete'
+					});
+					dialog.addEventListener('click', function(e){
+						if (e.index != e.source.cancel){
+							Cloud.Objects.remove({
+								classname: 'Platforms',
+								id: platformToRemove
+							}, function (e) {
+								if (e.success) {
+									updated.setText('  OS Successfully Removed  ');
+									deviceWin.add(updated); updated.animate(startupAnimation);
+									setTimeout(function(){
+									    updated.animate(endAnimation);
+									    setTimeout(function(){ deviceWin.remove(updated); },2000);
+									}, 2000);
+								} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+							});
+						}
+					});
+					dialog.show();
+				}
 			}
 		}
 	}
