@@ -1,5 +1,5 @@
-Titanium.UI.setBackgroundColor('#484850');
-var Cloud = require('ti.cloud'), scannerFile = require('scannerFile'),
+Ti.UI.setBackgroundColor('#484850');
+var Cloud = require('ti.cloud'), scannerFile = require('scannerFile'), userLog = require('userLog'),
 	scanditsdk = require('com.mirasense.scanditsdk'), cameraIndexField,
 	startupAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:1, duration:1000}),
 	endAnimation = Ti.UI.createAnimation({curve:Ti.UI.ANIMATION_CURVE_EASE_OUT, opacity:0, duration:1000}),
@@ -8,8 +8,8 @@ var Cloud = require('ti.cloud'), scannerFile = require('scannerFile'),
 	admin = false, loggedIn = false, photo = null, allPlatforms = [], currentPlatforms = [];
 
 // check for network
-if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
-     var alertDialog = Titanium.UI.createAlertDialog({
+if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
+	var alertDialog = Ti.UI.createAlertDialog({
 		title: 'WARNING!',
 		message: 'Your device is not online.\nThis app will not work if you aren\'t connected.',
 	});
@@ -17,7 +17,7 @@ if(!Titanium.Network.networkType != Titanium.Network.NETWORK_NONE){
 }
 
 function getPlatforms() {
-	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){	
+	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){	
 		platforms = []; 
 		Cloud.Objects.query({
 			classname: 'Platforms',
@@ -36,72 +36,10 @@ function getPlatforms() {
 }
 getPlatforms();
 	
-var login = Ti.UI.createButton({ title:'Log In', color:'white', backgroundImage: 'none' }),
-	logout = Ti.UI.createButton({ title:'Log Out', color:'white', backgroundImage: 'none' });
-login.addEventListener('click', function() { logIn(); });
-logout.addEventListener('click', function() { logOut(); });
-
-
-function logIn(){
-	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
-		scannerFile.closeScanner();
-		var loginWindow = Ti.UI.createView({backgroundColor:"white", layout:"vertical"});
-		var userName = Ti.UI.createTextField({top:50, autocorrect:false, hintText:'Username'});
-		var userPassword = Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password'});
-		var loginButton = Ti.UI.createButton({title:"Log In", top:30});
-		var cancelButton = Ti.UI.createButton({title:"Cancel", top:30});
-		cameraWin.setLeftNavButton(blank);
-		loginButton.addEventListener("click", function() {
-			Cloud.Users.login({
-	    		login: userName.value,
-				password: userPassword.value
-			}, function (e) {
-	    		if (e.success) {
-	        		var user = e.users[0];
-	        		var loginDialog = Ti.UI.createAlertDialog({
-						message: 'Welcome '+user.first_name+' '+user.last_name,
-						title: 'Logged In'
-					});
-					loginDialog.show();
-					cameraWin.setLeftNavButton(logout);
-					cameraWin.remove(loginWindow);
-					scannerFile.openScanner();
-					if (user.admin == 'true')
-						admin = true;
-	    		} else {
-	            	alert('Incorrect Username/Password');
-	    		}
-			});
-		});
-		loggedIn = true;
-		cancelButton.addEventListener("click", function() {
-			cameraWin.remove(loginWindow);
-			scannerFile.openScanner();
-			cameraWin.setLeftNavButton(login);
-		});
-		loginWindow.add(userName); loginWindow.add(userPassword);
-		loginWindow.add(loginButton); loginWindow.add(cancelButton);
-		cameraWin.add(loginWindow);
-	}
-}
-function logOut(){
-	if(!Titanium.Network.networkType == Titanium.Network.NETWORK_NONE){
-		Cloud.Users.logout(function (e) {
-			if (e.success) {
-				var logoutDialog = Ti.UI.createAlertDialog({
-					message: 'You have been logged out',
-					title: 'Logged Out'
-				});
-				logoutDialog.show();
-				var user = null;
-				cameraWin.setLeftNavButton(login);
-			} else {
-				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-			}
-		});
-		loggedIn = false; admin = false;
-	}
-}
+var login	= Ti.UI.createButton({ title:'Log In', color:'white', backgroundImage: 'none' }),
+	logout	= Ti.UI.createButton({ title:'Log Out', color:'white', backgroundImage: 'none' });
+login.addEventListener('click', function() { userLog.logIn(); });
+logout.addEventListener('click', function() { userLog.logOut(); });
 
 //-- START OF SCANNER VIEW SECTION --\\
 
@@ -119,7 +57,7 @@ cameraWin.addEventListener('blur', function() { scannerFile.closeScanner(); });
 cameraWin.addEventListener('swipe', function(e) { if (e.direction == 'left') { tabGroup.setActiveTab(1); if(admin == true) deviceWin.setRightNavButton(add); }});
 deviceWin.addEventListener('focus', function() { deviceList.setData(platforms); deviceWin.setLeftNavButton(blank); });
 deviceWin.addEventListener('swipe', function(e) { if (e.direction == 'right') { tabGroup.setActiveTab(0); if(admin == true) deviceWin.setRightNavButton(blank); }});
-login.addEventListener("click", function() { logIn(); });
+login.addEventListener("click", function() { userLog.logIn(); });
 cameraWin.setLeftNavButton(login);
 
 //-- END OF SCANNER VIEW SECTION --\\
@@ -208,23 +146,20 @@ save.addEventListener('singletap', function() {
 			updated.setText('  Saved Device Information  ');
 			deviceWin.add(updated); updated.animate(startupAnimation);
 			setTimeout(function(){
-			    updated.animate(endAnimation);
-			    setTimeout(function(){ deviceWin.remove(updated); },2000);
+				updated.animate(endAnimation);
+				setTimeout(function(){ deviceWin.remove(updated); },2000);
 			}, 2000);
 			deviceWin.remove(editWindow);
 			deviceWin.setLeftNavButton(backToDevices);
 			deviceWin.setRightNavButton(edit);
-		} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
 	});
 	photo = null;
 });
 backToPlatforms.addEventListener('singletap', function() {
 	deviceList.setData(platforms);
 	deviceWin.setLeftNavButton(blank);
-	if(admin == true)
-		deviceWin.setRightNavButton(add);
-	else
-		deviceWin.setRightNavButton(blank);
+	if(admin == true) deviceWin.setRightNavButton(add); else deviceWin.setRightNavButton(blank);
 });
 backToDevices.addEventListener('singletap', function() {
 	deviceWin.remove(deviceWindow);
@@ -271,13 +206,13 @@ upload.addEventListener('singletap', function() {
 				updated.setText('  Device Added Successfully  ');
 				deviceWin.add(updated); updated.animate(startupAnimation);
 				setTimeout(function(){
-				    updated.animate(endAnimation);
-				    setTimeout(function(){ deviceWin.remove(updated); },2000);
+					updated.animate(endAnimation);
+					setTimeout(function(){ deviceWin.remove(updated); },2000);
 				}, 2000);
 				deviceWin.remove(addWindow);
 				deviceWin.setLeftNavButton(blank);
 				deviceWin.setRightNavButton(add);
-			} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+			} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
 		});
 		photo = null;
 		if ( currentPlatforms.indexOf(devicePlatformValue.value) > -1 ){
@@ -303,10 +238,10 @@ deleteDevice.addEventListener('singletap', function() {
 				updated.setText('  Device Successfully Removed  ');
 				deviceWin.add(updated); updated.animate(startupAnimation);
 				setTimeout(function(){
-				    updated.animate(endAnimation);
-				    setTimeout(function(){ deviceWin.remove(updated); },2000);
+					updated.animate(endAnimation);
+					setTimeout(function(){ deviceWin.remove(updated); },2000);
 				}, 2000);
-		    } else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		    } else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
 		});
 	}
 });
@@ -363,15 +298,15 @@ deviceList.addEventListener('singletap', function(e){
 				Cloud.Users.query({
 					where:{ id: takenByID }
 				}, function (a) {
-				    if (a.success){    
-					    var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
-				   		deviceImage.setImage(deviceImageURL);
-				   		devicePlatformValue.setValue(e.rowData.platform);
-				   		deviceOSValue.setValue(e.rowData.osver);
-				   		deviceModelValue.setValue(e.rowData.model);
-				   		deviceNameValue.setValue(e.rowData.name);
-				   		deviceIMEIValue.setValue(e.rowData.imei);
-				   		deviceIDValue = e.rowData.id;
+					if (a.success){    
+						var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
+						deviceImage.setImage(deviceImageURL);
+						devicePlatformValue.setValue(e.rowData.platform);
+						deviceOSValue.setValue(e.rowData.osver);
+						deviceModelValue.setValue(e.rowData.model);
+						deviceNameValue.setValue(e.rowData.name);
+						deviceIMEIValue.setValue(e.rowData.imei);
+						deviceIDValue = e.rowData.id;
 						deviceWin.add(deviceWindow);
 					}
 				});
@@ -388,7 +323,7 @@ deviceList.addEventListener('longpress', function(e){
 					var dialog = Ti.UI.createAlertDialog({
 						cancel: 1,
 						buttonNames: ['Confirm', 'Cancel'],
-						message: 'Would you like to delete this OS?',
+						message: 'Are you sure you want to delete this platform?',
 						title: 'Delete'
 					});
 					dialog.addEventListener('click', function(e){
@@ -398,13 +333,13 @@ deviceList.addEventListener('longpress', function(e){
 								id: platformToRemove
 							}, function (e) {
 								if (e.success) {
-									updated.setText('  OS Successfully Removed  ');
+									updated.setText('  Platform Successfully Removed  ');
 									deviceWin.add(updated); updated.animate(startupAnimation);
 									setTimeout(function(){
-									    updated.animate(endAnimation);
-									    setTimeout(function(){ deviceWin.remove(updated); },2000);
+										updated.animate(endAnimation);
+										setTimeout(function(){ deviceWin.remove(updated); },2000);
 									}, 2000);
-								} else alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+								} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
 							});
 						}
 					});
@@ -413,6 +348,7 @@ deviceList.addEventListener('longpress', function(e){
 			}
 		}
 	}
+	var platformToRemove = "";
 });
 
 //-- END OF DEVICE TABLE SECTION --\\
