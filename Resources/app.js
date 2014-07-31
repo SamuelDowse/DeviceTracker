@@ -36,28 +36,30 @@ function getPlatforms() {
 }
 getPlatforms();
 	
-var login	= Ti.UI.createButton({ title:'Log In', color:'white', backgroundImage: 'none' }),
-	logout	= Ti.UI.createButton({ title:'Log Out', color:'white', backgroundImage: 'none' });
+var login	= Ti.UI.createButton({title:'Log In', color:'white', backgroundImage:'none'}),
+	logout	= Ti.UI.createButton({title:'Log Out', color:'white', backgroundImage:'none'});
 login.addEventListener('click', function() { userLog.logIn(); });
 logout.addEventListener('click', function() { userLog.logOut(); });
 
 //-- START OF SCANNER VIEW SECTION --\\
 
-var tabGroup	= Ti.UI.createTabGroup({tabsBackgroundColor :'#B50D00', backgroundColor:'#484850' }),
-	cameraWin	= Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden: true }),
-	deviceWin	= Ti.UI.createWindow({ title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00' }),
-	cameraTab	= Ti.UI.createTab({ title:'Scanner', icon:'assets/camera.png', window:cameraWin, backgroundSelectedColor:'white' }),
-	deviceTab	= Ti.UI.createTab({ title:'Devices', icon:'assets/device.png', window:deviceWin, backgroundSelectedColor:'white' }),
-	login		= Ti.UI.createButton({ title:"Log In", color:"white", backgroundImage: 'none' }),
-	clear		= Ti.UI.createButton({ title:"Clear", color:"white", backgroundImage: 'none' });
+var tabGroup	= Ti.UI.createTabGroup({tabsBackgroundColor:'#B50D00', backgroundColor:'#484850'}),
+	cameraWin	= Ti.UI.createWindow({ title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true}),
+	deviceWin	= Ti.UI.createWindow({ title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00'}),
+	deviceWindow= Ti.UI.createView({backgroundColor:'white'}),
+	cameraTab	= Ti.UI.createTab({title:'Scanner', icon:'assets/camera.png', window:cameraWin, backgroundSelectedColor:'white'}),
+	deviceTab	= Ti.UI.createTab({title:'Devices', icon:'assets/device.png', window:deviceWin, backgroundSelectedColor:'white'}),
+	login		= Ti.UI.createButton({title:"Log In", color:"white", backgroundImage:'none'}),
+	clear		= Ti.UI.createButton({title:"Clear", color:"white", backgroundImage:'none'});
 
 clear.addEventListener("click", function() { scannedDevices = []; if (Ti.Platform.osname != 'android') cameraWin.setRightNavButton(blank); });
-cameraWin.addEventListener('focus', function() { scannerFile.openScanner(); });
 cameraWin.addEventListener('blur', function() { scannerFile.closeScanner(); });
+cameraWin.addEventListener('focus', function() { scannerFile.openScanner(); });
 cameraWin.addEventListener('swipe', function(e) { if (e.direction == 'left') { tabGroup.setActiveTab(1); if(admin == true) deviceWin.setRightNavButton(add); }});
-deviceWin.addEventListener('focus', function() { deviceList.setData(platforms); deviceWin.setLeftNavButton(blank); });
+deviceWin.addEventListener('blur', function() { deviceWin.remove(deviceWindow); deviceList.setData(platforms); });
+deviceWin.addEventListener('focus', function() { deviceWin.setLeftNavButton(blank); });
 deviceWin.addEventListener('swipe', function(e) { if (e.direction == 'right') { tabGroup.setActiveTab(0); if(admin == true) deviceWin.setRightNavButton(blank); }});
-login.addEventListener("click", function() { userLog.logIn(); });
+login.addEventListener("click", function() { userLog.logIn(); });	
 cameraWin.setLeftNavButton(login);
 
 //-- END OF SCANNER VIEW SECTION --\\
@@ -77,7 +79,6 @@ var backToPlatforms		= Ti.UI.createButton({title:'Back', color:'white', backgrou
 	deviceList			= Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control}),
 	editWindow			= Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
 	addWindow			= Ti.UI.createView({backgroundColor:'white', layout:'vertical'}),
-	deviceWindow		= Ti.UI.createView({backgroundColor:'white'}),
 	deleteDevice		= Ti.UI.createLabel({backgroundColor:'#B50D00', text:'DELETE', textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, color:'white', top:'15%', width:'50%', height:'10%'}),
 	deviceInfo			= Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%'}),
 	deviceImage			= Ti.UI.createImageView({top:20, bottom:20, height:'50%'}),
