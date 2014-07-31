@@ -10,8 +10,8 @@ var Cloud = require('ti.cloud'), scannerFile = require('scannerFile'), userLog =
 // check for network
 if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
 	var alertDialog = Ti.UI.createAlertDialog({
-		title: 'WARNING!',
-		message: 'Your device is not online.\nThis app will not work if you aren\'t connected.',
+		title:'WARNING!',
+		message:'Your device is not online.\nThis app will not work if you aren\'t connected.',
 	});
 	alertDialog.show();
 }
@@ -20,7 +20,7 @@ function getPlatforms() {
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){	
 		platforms = []; 
 		Cloud.Objects.query({
-			classname: 'Platforms',
+			classname:'Platforms',
 			order:'platform'
 		}, function (e) {
 			for (var i = 0; i < e.Platforms.length; i++) {
@@ -134,7 +134,7 @@ save.addEventListener('singletap', function() {
 	Cloud.Objects.update({
 		classname:'Device',
 		id:deviceIDValue,
-		photo: photo,
+		photo:photo,
 		fields:{
 			platform:devicePlatformValue.value,
 			osver:deviceOSValue.value,
@@ -193,9 +193,9 @@ upload.addEventListener('singletap', function() {
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Objects.create({
 			classname:'Device',
-			acl_name: 'Device',
-			photo: photo,
-			fields: {
+			acl_name:'Device',
+			photo:photo,
+			fields:{
 		        name:deviceNameValue.value,
 		        platform:devicePlatformValue.value,
 		        model:deviceModelValue.value,
@@ -228,8 +228,8 @@ upload.addEventListener('singletap', function() {
 deleteDevice.addEventListener('singletap', function() {
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Objects.remove({
-		    classname: 'Device',
-		    id: deviceIDValue
+		    classname:'Device',
+		    id:deviceIDValue
 		}, function (e) {
 		    if (e.success) {
 		        deviceWin.remove(editWindow);
@@ -252,10 +252,10 @@ deviceList.addEventListener('singletap', function(e){
 			if (e.rowData.platform == true){
 				deviceWin.setLeftNavButton(blank);
 				Cloud.Objects.query({
-				    classname: 'Device',
-				    order: "osver, model",
+				    classname:'Device',
+				    order:"osver, model",
 				    per_page:100,
-				    where: { platform: e.rowData.name }
+				    where:{ platform:e.rowData.name }
 				}, function (e) {
 				    if (e.success) {
 				    	deviceWin.setLeftNavButton(backToPlatforms);
@@ -264,16 +264,16 @@ deviceList.addEventListener('singletap', function(e){
 				        for (var i = 0; i < e.Device.length; i++){
 				            var device = e.Device[i];
 				            devices.push({
-				            	title: device.model+' ('+device.osver+')',
-				            	model: device.model,
-				            	name: device.name,
-				            	imei: device.imei,
-				            	platform: device.platform,
-				            	osver: device.osver,
-				            	takenBy: device.taken_by,
-				            	image: device.photo,
-				            	id: device.id,
-				            	color: 'white'
+				            	title:device.model+' ('+device.osver+')',
+				            	model:device.model,
+				            	name:device.name,
+				            	imei:device.imei,
+				            	platform:device.platform,
+				            	osver:device.osver,
+				            	takenBy:device.taken_by,
+				            	image:device.photo,
+				            	id:device.id,
+				            	color:'white'
 				            });
 				        }
 				        deviceList.setData(devices);
@@ -284,7 +284,7 @@ deviceList.addEventListener('singletap', function(e){
 				if(admin == true) deviceWin.setRightNavButton(edit);
 				if (e.rowData.takenBy != undefined){
 					Cloud.Users.query({
-						where:{ id: e.rowData.takenBy }
+						where:{ id:e.rowData.takenBy }
 					}, function (a) {
 						var takenBy = a.users[0];
 			    		if (a.success){
@@ -297,7 +297,7 @@ deviceList.addEventListener('singletap', function(e){
 					deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nNot In Use');
 				}
 				Cloud.Users.query({
-					where:{ id: takenByID }
+					where:{ id:takenByID }
 				}, function (a) {
 					if (a.success){    
 						var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
@@ -322,16 +322,16 @@ deviceList.addEventListener('longpress', function(e){
 			if (e.rowData.platform == true){
 				if(admin == true){
 					var dialog = Ti.UI.createAlertDialog({
-						cancel: 1,
-						buttonNames: ['Confirm', 'Cancel'],
-						message: 'Are you sure you want to delete this platform?',
-						title: 'Delete'
+						cancel:1,
+						buttonNames:['Confirm', 'Cancel'],
+						message:'Are you sure you want to delete this platform?',
+						title:'Delete'
 					});
 					dialog.addEventListener('click', function(e){
 						if (e.index != e.source.cancel){
 							Cloud.Objects.remove({
-								classname: 'Platforms',
-								id: platformToRemove
+								classname:'Platforms',
+								id:platformToRemove
 							}, function (e) {
 								if (e.success) {
 									updated.setText('  Platform Successfully Removed  ');
@@ -340,6 +340,7 @@ deviceList.addEventListener('longpress', function(e){
 										updated.animate(endAnimation);
 										setTimeout(function(){ deviceWin.remove(updated); },2000);
 									}, 2000);
+									var platformToRemove = "";
 								} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
 							});
 						}
@@ -349,7 +350,6 @@ deviceList.addEventListener('longpress', function(e){
 			}
 		}
 	}
-	var platformToRemove = "";
 });
 
 //-- END OF DEVICE TABLE SECTION --\\
