@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
+    <property name="active-environment-name" type="string">development</property>
+    <property name="active-environment-id" type="string">development</property>
+    <property name="acs-api-key" type="string">2FrwFse1L3sAAVzqp8QMMb7qySOriQ6l</property>
     <property name="com-appcelerator-apm-id" type="string">53a73470894b506c68000046</property>
     <property name="acs-api-key-production" type="string">8lQXqmfgvqZk5qM5YeUSXJHD28tnp3om</property>
     <property name="acs-authbase-url" type="string">https://secure-identity.cloud.appcelerator.com</property>
@@ -90,18 +93,24 @@
         <theme>default</theme>
     </mobileweb>
     <modules>
-        <module platform="commonjs">ti.cloud</module>
+        <module deploy-type="test" platform="iphone" version="1.0">com.soasta.touchtest</module>
+        <module platform="android">com.appcelerator.apm</module>
         <module platform="android">com.mirasense.scanditsdk</module>
-        <module platform="iphone">com.mirasense.scanditsdk</module>
         <module platform="android">ti.cloudpush</module>
+        <module platform="commonjs">ti.cloud</module>
+        <module platform="iphone">com.appcelerator.apm</module>
+        <module platform="iphone">com.mirasense.scanditsdk</module>
+        <module deploy-type="development" platform="iphone" version="1.0">com.soasta.touchtest</module>
     </modules>
     <deployment-targets>
         <target device="tizen">false</target>
-        <target device="android">true</target>
+        <target device="android">false</target>
         <target device="blackberry">false</target>
         <target device="ipad">true</target>
         <target device="iphone">true</target>
         <target device="mobileweb">false</target>
     </deployment-targets>
     <sdk-version>3.3.0.GA</sdk-version>
+    <property name="com-soasta-touchtest-version" type="string">7040.132</property>
+    <property name="com-soasta-touchtest-ios-appId" type="string">275985</property>
 </ti:app>
