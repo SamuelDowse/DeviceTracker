@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+iosLaunchConfigurationAttributes/ATTR_MINIFY=true
+iosLaunchConfigurationAttributes/ATTR_PROJECT_NAME=DeviceTracker
+iosLaunchConfigurationAttributes/ATTR_UPLOAD_DEBUG_SYMBOLS=false
+iosLaunchConfigurationAttributes/appid=com.appcelerator.devicetracker
+iosLaunchConfigurationAttributes/certificate=QE Department (C64864TF2L)
+iosLaunchConfigurationAttributes/distribute_path=/Users/sdowse/Documents
+iosLaunchConfigurationAttributes/keychain=
+iosLaunchConfigurationAttributes/output_format=ipa
+iosLaunchConfigurationAttributes/sdk_version=7.1
+iosLaunchConfigurationAttributes/uuid=304AC6B9-FECE-4015-A0D8-A0CB34105A07

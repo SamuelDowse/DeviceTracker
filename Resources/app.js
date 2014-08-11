@@ -253,7 +253,7 @@ deviceList.addEventListener('singletap', function(e){
 				deviceWin.setLeftNavButton(blank);
 				Cloud.Objects.query({
 				    classname:'Device',
-				    order:"osver, model",
+				    order:"-osver, model",
 				    per_page:100,
 				    where:{ platform:e.rowData.name }
 				}, function (e) {
