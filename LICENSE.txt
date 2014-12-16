@@ -1,5 +1,1 @@
-This project was started on:
-	Sunday 23rd of June, 12:52 pm
-
-This project was finished on:
-	TBH
+Place your license text here.  This file will be incorporated with your app at package time.
