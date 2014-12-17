@@ -5,6 +5,7 @@ function logIn(){
 			userPassword	= Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password', color:'black'}),
 			loginButton		= Ti.UI.createButton({title:"Log In", top:30, color:'black'}),
 			cancelButton	= Ti.UI.createButton({title:"Cancel", top:30, color:'black'});
+			
 		loginButton.addEventListener("click", function() {
 			Cloud.Users.login({
 	    		login: userName.value,
@@ -12,23 +13,24 @@ function logIn(){
 			}, function (e) {
 	    		if (e.success) {
 	        		var user = e.users[0];
-	        		var loginDialog = Ti.UI.createAlertDialog({
-						message: 'Welcome '+user.first_name+' '+user.last_name,
-						title: 'Logged In'
-					});
-					loginDialog.show();
-					cameraWin.remove(loginWindow);
+	        		cameraWin.remove(loginWindow);
 					scannerFile.openScanner();
+					loggedIn = true;
 					if (user.admin == 'true')
 						admin = true;
-	    		} else { alert('Incorrect Username/Password'); }
+					cameraWin.remove(loginWindow);
+					scannerFile.openScanner();
+	    		} else {
+	    			alert('Incorrect Username/Password');
+	    		}
 			});
 		});
-		loggedIn = true;
+		
 		cancelButton.addEventListener("click", function() {
 			cameraWin.remove(loginWindow);
 			scannerFile.openScanner();
 		});
+		
 		loginWindow.add(userName);
 		loginWindow.add(userPassword);
 		loginWindow.add(loginButton);
@@ -46,7 +48,9 @@ function logOut(){
 				});
 				logoutDialog.show();
 				var user = null;
-			} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+			} else {
+				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+			}
 		});
 		loggedIn = false;
 		admin = false;

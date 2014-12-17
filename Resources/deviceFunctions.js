@@ -1,6 +1,5 @@
 function getPlatforms() {
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){	
-		platforms = []; 
 		Cloud.Objects.query({
 			classname:'Platforms',
 			order:'platform'
@@ -24,8 +23,14 @@ function addPicture(evt){
 		},
 		cancel:function(){},
 		error:function(error){
-			var a = Ti.UI.createAlertDialog({title:'Error Occurred'});
-			((error.code == Ti.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: ' + error.code));
+			var a = Ti.UI.createAlertDialog({
+				title:'Error Occurred'
+			});
+			if (error.code == Ti.Media.NO_CAMERA){
+				a.setMessage('Device Tracker is unable to connect to your camera, do you have one?');
+			} else {
+				a.setMessage('Unexpected error: ' + error.code);
+			}
 			a.show();
 		}
 	});
@@ -49,12 +54,16 @@ function saveDevice(){
 			deviceWin.add(updated); updated.animate(startupAnimation);
 			setTimeout(function(){
 				updated.animate(endAnimation);
-				setTimeout(function(){ deviceWin.remove(updated); },2000);
+				setTimeout(function(){
+					deviceWin.remove(updated);
+				},2000);
 			}, 2000);
 			deviceWin.remove(editWindow);
 			//deviceWin.setLeftNavButton(backToDevices);
 			//deviceWin.setRightNavButton(edit);
-		} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+		} else {
+			alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		}
 	});
 	photo = null;
 }
@@ -78,12 +87,16 @@ function uploadDevice(){
 				deviceWin.add(updated); updated.animate(startupAnimation);
 				setTimeout(function(){
 					updated.animate(endAnimation);
-					setTimeout(function(){ deviceWin.remove(updated); },2000);
+					setTimeout(function(){
+						deviceWin.remove(updated);
+					},2000);
 				}, 2000);
 				deviceWin.remove(addWindow);
 				//deviceWin.setLeftNavButton(blank);
 				//deviceWin.setRightNavButton(add);
-			} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+			} else {
+				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+			}
 		});
 		photo = null;
 		if ( currentPlatforms.indexOf(devicePlatformValue.value) > -1 ){
@@ -91,7 +104,11 @@ function uploadDevice(){
 		} else {
 			Cloud.Objects.create({
 				classname:'Platforms',acl_name:'Device',fields:{platform:devicePlatformValue.value}
-			}, function (e) { if (!e.success) alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); });
+			}, function (e) {
+				if (!e.success){
+					alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+				}
+			});
 		}
 	}
 }
@@ -111,9 +128,13 @@ function deleteDevice(){
 				deviceWin.add(updated); updated.animate(startupAnimation);
 				setTimeout(function(){
 					updated.animate(endAnimation);
-					setTimeout(function(){ deviceWin.remove(updated); },2000);
+					setTimeout(function(){
+						deviceWin.remove(updated);
+					},2000);
 				}, 2000);
-			} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+			} else {
+				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+			}
 		});
 	}
 }
@@ -141,10 +162,14 @@ function deletePlatform(e){
 									deviceWin.add(updated); updated.animate(startupAnimation);
 									setTimeout(function(){
 										updated.animate(endAnimation);
-										setTimeout(function(){ deviceWin.remove(updated); },2000);
+										setTimeout(function(){
+											deviceWin.remove(updated);
+										},2000);
 									}, 2000);
 									var platformToRemove = "";
-								} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+								} else {
+									alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+								}
 							});
 						}
 					});
@@ -172,7 +197,6 @@ function selectDevice(e){
 				        var devices = [];
 				        for (var i = 0; i < e.Device.length; i++){
 				            var device = e.Device[i];
-				            console.log(e.Device[i]);
 				            devices.push({
 				            	title:device.model+' ('+device.osver+')',
 				            	model:device.model,
@@ -218,12 +242,29 @@ function selectDevice(e){
 						deviceNameValue.setValue(e.rowData.name);
 						deviceIMEIValue.setValue(e.rowData.imei);
 						deviceIDValue = e.rowData.id;
-						deviceWin.add(deviceWindow);
+						cameraWin.add(deviceWindow);
 					}
 				});
 			}
 		}
 	}
+}
+
+function setMenu(){
+	cameraWin.activity.onCreateOptionsMenu = function(e) {
+		var menu = e.menu;
+		menu.clear();
+		if (admin == true){
+			var item1 = menu.add({
+				title : 'Add Device',
+				showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
+			});
+		}
+		var item2 = menu.add({
+			title : 'Clear Scanned Devices',
+			showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
+		});
+	};
 }
 
 exports.getPlatforms = getPlatforms;
@@ -233,3 +274,4 @@ exports.uploadDevice = uploadDevice;
 exports.deleteDevice = deleteDevice;
 exports.deletePlatform = deletePlatform;
 exports.selectDevice = selectDevice;
+exports.setMenu = setMenu;

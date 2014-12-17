@@ -1,31 +1,80 @@
-var scannedDevices = []; 
+var closeDeviceWin = function() {
+	cameraWin.remove(deviceWin);
+	cameraWin.remove(deviceWindow);
+	deviceList.setData(platforms);
+    return false;
+    cameraWin.removeEventListener('androidback', closeDeviceWin);
+};
+	
 function openScanner(){
-    picker = scanditsdk.createView({ width:'100%', height:'100%' });
+    picker = scanditsdk.createView({
+    	width:'100%',
+    	height:'100%'
+    });
     picker.init('9VYuOmbDEeOdM21j18UUIGKVF9o+PtHC5XrXuXYCmjQ', 0);
     picker.showSearchBar(true);
+    
     picker.setSuccessCallback(function(e) {
     	scannedDevices.push(e.barcode);
     	Ti.Media.vibrate();
     });
-    picker.setCancelCallback(function(e) { closeScanner(); });
-	var login = Ti.UI.createButton({backgroundImage:'assets/user.png', bottom:'5%', left:'10%', width:50, height:50}),
-		logout = Ti.UI.createButton({backgroundImage:'assets/user.png', bottom:'5%', left:'10%', width:50, height:50}),
-		checkout = Ti.UI.createButton({backgroundImage:'assets/capture.png', bottom:'6%', width:60, height:60}),
-		listDevice = Ti.UI.createButton({backgroundImage:'assets/list.png', bottom:'5%', right:'10%', width:50, height:50});
-	login.addEventListener('click', function() { closeScanner(); userLog.logIn(); });
-	logout.addEventListener('click', function() { userLog.logOut(); });
+    
+    picker.setCancelCallback(function(e) {
+    	closeScanner();
+    });
+    
+    cameraWin.addEventListener("open", function() {
+		if (Ti.Platform.osname === "android") {
+			if (!cameraWin.activity) {
+				Ti.API.error("Can't access action bar on a lightweight window.");
+			} else {
+				actionBar = cameraWin.activity.actionBar;
+				if (actionBar) {
+					actionBar.onHomeIconItemSelected = function() {
+						picker.add(login);
+						picker.add(checkout);
+						picker.add(listDevice);
+						cameraWin.add(picker);
+					};
+				}
+			}
+		}
+	});
+	
+	login.addEventListener('click', function() {
+		userLog.logIn();
+	});
+	
+	logout.addEventListener('click', function() {
+		userLog.logOut();
+	});
+	
 	checkout.addEventListener('click', function() {
-		uniqueDevices = scannedDevices.filter(function(elem, pos) { return scannedDevices.indexOf(elem) == pos; });
-		if (loggedIn == true) checkoutDevice(); else logCheckDevice();
+		uniqueDevices = scannedDevices.filter(function(elem, pos) {
+			return scannedDevices.indexOf(elem) == pos;
+		});
+		if (loggedIn == true)
+			checkoutDevice();
+		else
+			logCheckDevice();
 		scannedDevices = [];
 	});
-	listDevice.addEventListener('click', function() { deviceWin.add(deviceList); cameraWin.add(deviceWin); closeScanner(); });
+	
+	listDevice.addEventListener('click', function() {
+		deviceFunctions.setMenu();
+		deviceList.setData(platforms);
+		deviceWin.add(deviceList);
+		cameraWin.add(deviceWin);
+		cameraWin.addEventListener('androidback', closeDeviceWin);
+	});
+	
+	picker.startScanning();
 	picker.add(login);
 	picker.add(checkout);
 	picker.add(listDevice);
 	cameraWin.add(picker);
-	picker.startScanning();
 }
+
 function checkoutDevice(){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Users.showMe(function (e) {
@@ -47,9 +96,13 @@ function checkoutDevice(){
 											fields: { taken_by: null }
 										}, function (e) {
 											if (e.success) {
-												var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name });
+												var unlinkDialog = Ti.UI.createAlertDialog({
+													message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name
+													});
 												unlinkDialog.show();
-											} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+											} else {
+												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+											}
 										});
 										break;
 									default:
@@ -59,9 +112,13 @@ function checkoutDevice(){
 											fields: { taken_by: user.id }
 										}, function (e) {
 											if (e.success) {
-												var linkDialog = Ti.UI.createAlertDialog({message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name });
+												var linkDialog = Ti.UI.createAlertDialog({
+													message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name
+												});
 												linkDialog.show();
-											} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+											} else {
+												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+											}
 										});
 										break;
 								}
@@ -73,6 +130,7 @@ function checkoutDevice(){
 		});
 	}
 }
+
 function logCheckDevice(){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Users.login({login:'assigner',password:'tester'}, function (e) { 
@@ -98,9 +156,13 @@ function logCheckDevice(){
 													fields: {taken_by:null}
 												}, function (e) {
 													if (e.success) {
-														var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name });
+														var unlinkDialog = Ti.UI.createAlertDialog({
+															message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name
+														});
 														unlinkDialog.show();
-													} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+													} else {
+														alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+													}
 												});
 												break;
 											default:
@@ -110,9 +172,13 @@ function logCheckDevice(){
 													fields: { taken_by:uniqueDevices[0]}
 												}, function (e) {
 													if (e.success) {
-														var linkDialog = Ti.UI.createAlertDialog({message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name });
+														var linkDialog = Ti.UI.createAlertDialog({
+															message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name
+														});
 														linkDialog.show();
-													} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+													} else {
+														alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+													}
 												});
 												break;
 										}
@@ -136,9 +202,13 @@ function logCheckDevice(){
 											fields: {taken_by:null}
 										}, function (e) {
 											if (e.success) {
-												var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unlinking Device From User' });
+												var unlinkDialog = Ti.UI.createAlertDialog({
+													message: 'Unlinking Device From User'
+												});
 												unlinkDialog.show();
-											} else { alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))); }
+											} else {
+												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+											}
 										});
 					        		}
 					    		}
@@ -150,9 +220,12 @@ function logCheckDevice(){
 		});
 	}
 }
+
 function closeScanner(){
-	if (picker != null) picker.stopScanning();
+	if (picker != null) 
+		picker.stopScanning();
 	cameraWin.remove(picker);
 }
+
 exports.openScanner = openScanner;
 exports.closeScanner = closeScanner;
