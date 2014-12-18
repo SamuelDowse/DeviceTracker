@@ -124,9 +124,9 @@ function deleteDevice(){
 }
 
 function deletePlatform(e){
-	var platformToRemove = e.rowData.id;
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		if (e.rowData != null){
+			var platformToRemove = e.rowData.id;
 			if (e.rowData.platform == true){
 				if(admin == true){
 					var dialog = Ti.UI.createAlertDialog({
