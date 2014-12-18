@@ -34,9 +34,7 @@ function openScanner(){
 	});
 	
 	checkout.addEventListener('click', function() {
-		uniqueDevices = scannedDevices.filter(function(elem, pos) {
-			return scannedDevices.indexOf(elem) == pos;
-		});
+		uniqueDevices = scannedDevices.filter(function(elem, pos) { return scannedDevices.indexOf(elem) == pos; });
 		if (loggedIn == true)
 			checkoutDevice();
 		else
@@ -49,7 +47,8 @@ function openScanner(){
 		deviceList.setData(platforms);
 		deviceWin.add(deviceList);
 		cameraWin.add(deviceWin);
-		cameraWin.addEventListener('androidback', closeDeviceWin);
+		if (Ti.Platform.osname == 'android')
+			cameraWin.addEventListener('androidback', closeDeviceWin);
 		picker.stopScanning();
 	});
 	

@@ -23,14 +23,11 @@ function addPicture(evt){
 		},
 		cancel:function(){},
 		error:function(error){
-			var a = Ti.UI.createAlertDialog({
-				title:'Error Occurred'
-			});
-			if (error.code == Ti.Media.NO_CAMERA){
+			var a = Ti.UI.createAlertDialog({title:'Error Occurred'});
+			if (error.code == Ti.Media.NO_CAMERA)
 				a.setMessage('Device Tracker is unable to connect to your camera, do you have one?');
-			} else {
+			else
 				a.setMessage('Unexpected error: ' + error.code);
-			}
 			a.show();
 		}
 	});
@@ -53,7 +50,10 @@ function saveDevice(){
 			deviceWin.remove(editWindow);
 			if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
 				deviceWin.setLeftNavButton(backToDevices);
-				deviceWin.setRightNavButton(edit);
+				if(admin == true)
+					deviceWin.setRightNavButton(edit);
+				else
+					deviceWin.setRightNavButton(blank);
 			}
 		} else {
 			alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -80,7 +80,10 @@ function uploadDevice(){
 				deviceWin.remove(addWindow);
 				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
 					deviceWin.setLeftNavButton(blank);
-					deviceWin.setRightNavButton(add);
+					if(admin == true)
+						deviceWin.setRightNavButton(add);
+					else
+						deviceWin.setRightNavButton(blank);
 				}
 			} else {
 				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -93,9 +96,8 @@ function uploadDevice(){
 			Cloud.Objects.create({
 				classname:'Platforms',acl_name:'Device',fields:{platform:devicePlatformValue.value}
 			}, function (e) {
-				if (!e.success){
+				if (!e.success)
 					alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-				}
 			});
 		}
 	}
@@ -139,11 +141,10 @@ function deletePlatform(e){
 								classname:'Platforms',
 								id:platformToRemove
 							}, function (e) {
-								if (e.success) {
+								if (e.success)
 									var platformToRemove = "";
-								} else {
+								else
 									alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-								}
 							});
 						}
 					});
@@ -158,9 +159,8 @@ function selectDevice(e){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		if (e.rowData != null){
 			if (e.rowData.platform == true){
-				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad")
 					deviceWin.setLeftNavButton(blank);
-				}
 				Cloud.Objects.query({
 				    classname:'Device',
 				    order:"-osver, model",
@@ -194,7 +194,10 @@ function selectDevice(e){
 			} else {
 				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
 					deviceWin.setLeftNavButton(backToDevices);
-					if(admin == true) deviceWin.setRightNavButton(edit);
+					if(admin == true)
+						deviceWin.setRightNavButton(edit);
+					else
+						deviceWin.setRightNavButton(blank);
 				}
 				if (e.rowData.takenBy != undefined){
 					Cloud.Users.query({
