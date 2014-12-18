@@ -1,5 +1,9 @@
+/**
+ * Set up the UI for an iOS device.
+ * Everything visual outside of the scanning screen is set up in here.
+ */
 function beginiOS(){
-//-- EDIT DEVICE WINDOW--\\
+	//-- EDIT DEVICE WINDOW--\\
 	editWindow.add(devicePlatformValue);
 	editWindow.add(deviceOSValue);
 	editWindow.add(deviceModelValue);
@@ -72,4 +76,5 @@ function beginiOS(){
 	});
 }
 
+// Export the following functions so they can be used outside of this file
 exports.beginiOS = beginiOS;

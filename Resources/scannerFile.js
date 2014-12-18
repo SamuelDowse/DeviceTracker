@@ -3,8 +3,8 @@ var closeDeviceWin = function() {
 	cameraWin.remove(deviceWindow);
 	deviceList.setData(platforms);
 	picker.startScanning();
-    return false;
     cameraWin.removeEventListener('androidback', closeDeviceWin);
+    return false;
 };
 	
 function openScanner(){
@@ -212,5 +212,6 @@ function closeScanner(){
 	cameraWin.remove(picker);
 }
 
+// Export the following functions so they can be used outside of this file
 exports.openScanner = openScanner;
 exports.closeScanner = closeScanner;

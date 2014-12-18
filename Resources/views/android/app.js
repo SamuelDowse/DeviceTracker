@@ -1,5 +1,9 @@
+/**
+ * Set up the UI for an Android device.
+ * Everything visual outside of the scanning screen is set up in here.
+ */
 function beginAndroid(){
-//-- EDIT DEVICE WINDOW--\\
+	//-- EDIT DEVICE WINDOW--\\
 	editWindow.add(devicePlatformValue);
 	editWindow.add(deviceOSValue);
 	editWindow.add(deviceModelValue);
@@ -17,44 +21,23 @@ function beginAndroid(){
 	addWindow.add(takePhoto);
 	//--ADD DEVICE WINDOW--\\
 	
+	// Add the deviceImage to the deviceWindow
 	deviceWindow.add(deviceImage);
+	// Add the deviceInfo to the deviceWindow
 	deviceWindow.add(deviceInfo);
 	
-	takePhoto.addEventListener('click', function (evt){
-		deviceFunctions.addPicture(evt);
-	});
-	save.addEventListener('singletap', function() {
-		deviceFunctions.saveDevice();
-	});
-	closeAddWindow.addEventListener('singletap', function() {
-		deviceWin.remove(addWindow);
-		//deviceWin.setLeftNavButton(blank);
-		//deviceWin.setRightNavButton(add);
-	});
-	edit.addEventListener('singletap', function() {
-		deviceWin.add(editWindow);
-		//deviceWin.setLeftNavButton(backToDevice);
-		//deviceWin.setRightNavButton(save);
-	});
-	add.addEventListener('singletap', function() {
-		devicePlatformValue.setValue(null); deviceOSValue.setValue(null);
-		deviceModelValue.setValue(null); deviceNameValue.setValue(null);
-		deviceIMEIValue.setValue(null); deviceWin.add(addWindow);
-		//deviceWin.setLeftNavButton(closeAddWindow);
-		//deviceWin.setRightNavButton(upload);
-	});
-	upload.addEventListener('singletap', function() {
-		deviceFunctions.uploadDevice();
-	});
-	deleteDevice.addEventListener('singletap', function() {
-		deviceFunctions.deleteDevice();
-	});
+	// If the user taps on the deviceList
 	deviceList.addEventListener('singletap', function(e){
+		// Run the selectDevice function
 		deviceFunctions.selectDevice(e);
 	});
+	
+	// If the user holds an item on the deviceList
 	deviceList.addEventListener('longpress', function(e){
+		// Run the deletePlatform function
 		deviceFunctions.deletePlatform(e);
 	});
 }
 
+// Export the following functions so they can be used outside of this file
 exports.beginAndroid = beginAndroid;

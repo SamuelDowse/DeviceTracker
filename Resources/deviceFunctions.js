@@ -247,6 +247,7 @@ function setMenu(){
 	};
 }
 
+// Export the following functions so they can be used outside of this file
 exports.getPlatforms = getPlatforms;
 exports.addPicture = addPicture;
 exports.saveDevice = saveDevice;
