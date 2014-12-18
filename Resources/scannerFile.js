@@ -2,6 +2,7 @@ var closeDeviceWin = function() {
 	cameraWin.remove(deviceWin);
 	cameraWin.remove(deviceWindow);
 	deviceList.setData(platforms);
+	picker.startScanning();
     return false;
     cameraWin.removeEventListener('androidback', closeDeviceWin);
 };
@@ -22,27 +23,10 @@ function openScanner(){
     picker.setCancelCallback(function(e) {
     	closeScanner();
     });
-    
-    cameraWin.addEventListener("open", function() {
-		if (Ti.Platform.osname === "android") {
-			if (!cameraWin.activity) {
-				Ti.API.error("Can't access action bar on a lightweight window.");
-			} else {
-				actionBar = cameraWin.activity.actionBar;
-				if (actionBar) {
-					actionBar.onHomeIconItemSelected = function() {
-						picker.add(login);
-						picker.add(checkout);
-						picker.add(listDevice);
-						cameraWin.add(picker);
-					};
-				}
-			}
-		}
-	});
 	
 	login.addEventListener('click', function() {
 		userLog.logIn();
+		picker.stopScanning();
 	});
 	
 	logout.addEventListener('click', function() {
@@ -66,6 +50,7 @@ function openScanner(){
 		deviceWin.add(deviceList);
 		cameraWin.add(deviceWin);
 		cameraWin.addEventListener('androidback', closeDeviceWin);
+		picker.stopScanning();
 	});
 	
 	picker.startScanning();

@@ -24,7 +24,6 @@ var upload				= Ti.UI.createButton({title:'Upload', color:'white', backgroundIma
 var deviceImage			= Ti.UI.createImageView({top:20, bottom:20, height:'50%'});
 
 var deviceInfo			= Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%', color:'black'});
-var updated				= Ti.UI.createLabel({backgroundColor:'#303036', borderRadius:15, font:{fontSize:20}, color:'white', bottom:10, opacity:0});
 
 var search				= Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0});
 

@@ -50,17 +50,11 @@ function saveDevice(){
 		}
 	}, function (e) {
 		if (e.success){
-			updated.setText('  Saved Device Information  ');
-			deviceWin.add(updated); updated.animate(startupAnimation);
-			setTimeout(function(){
-				updated.animate(endAnimation);
-				setTimeout(function(){
-					deviceWin.remove(updated);
-				},2000);
-			}, 2000);
 			deviceWin.remove(editWindow);
-			//deviceWin.setLeftNavButton(backToDevices);
-			//deviceWin.setRightNavButton(edit);
+			if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+				deviceWin.setLeftNavButton(backToDevices);
+				deviceWin.setRightNavButton(edit);
+			}
 		} else {
 			alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 		}
@@ -83,17 +77,11 @@ function uploadDevice(){
 		    }
 		}, function (e) {
 			if (e.success){
-				updated.setText('  Device Added Successfully  ');
-				deviceWin.add(updated); updated.animate(startupAnimation);
-				setTimeout(function(){
-					updated.animate(endAnimation);
-					setTimeout(function(){
-						deviceWin.remove(updated);
-					},2000);
-				}, 2000);
 				deviceWin.remove(addWindow);
-				//deviceWin.setLeftNavButton(blank);
-				//deviceWin.setRightNavButton(add);
+				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+					deviceWin.setLeftNavButton(blank);
+					deviceWin.setRightNavButton(add);
+				}
 			} else {
 				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 			}
@@ -122,16 +110,10 @@ function deleteDevice(){
 			if (e.success) {
 				deviceWin.remove(editWindow);
 				deviceWin.remove(deviceWindow);
-				//deviceWin.setLeftNavButton(backToPlatforms);
-				//deviceWin.setRightNavButton(blank);
-				updated.setText('  Device Successfully Removed  ');
-				deviceWin.add(updated); updated.animate(startupAnimation);
-				setTimeout(function(){
-					updated.animate(endAnimation);
-					setTimeout(function(){
-						deviceWin.remove(updated);
-					},2000);
-				}, 2000);
+				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+					deviceWin.setLeftNavButton(backToPlatforms);
+					deviceWin.setRightNavButton(blank);
+				}
 			} else {
 				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 			}
@@ -158,14 +140,6 @@ function deletePlatform(e){
 								id:platformToRemove
 							}, function (e) {
 								if (e.success) {
-									updated.setText('  Platform Successfully Removed  ');
-									deviceWin.add(updated); updated.animate(startupAnimation);
-									setTimeout(function(){
-										updated.animate(endAnimation);
-										setTimeout(function(){
-											deviceWin.remove(updated);
-										},2000);
-									}, 2000);
 									var platformToRemove = "";
 								} else {
 									alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -184,7 +158,9 @@ function selectDevice(e){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		if (e.rowData != null){
 			if (e.rowData.platform == true){
-				//deviceWin.setLeftNavButton(blank);
+				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+					deviceWin.setLeftNavButton(blank);
+				}
 				Cloud.Objects.query({
 				    classname:'Device',
 				    order:"-osver, model",
@@ -192,8 +168,10 @@ function selectDevice(e){
 				    where:{ platform:e.rowData.name }
 				}, function (e) {
 				    if (e.success) {
-				    	//deviceWin.setLeftNavButton(backToPlatforms);
-				    	//deviceWin.setRightNavButton(blank);
+				    	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+				    		deviceWin.setLeftNavButton(backToPlatforms);
+				    		deviceWin.setRightNavButton(blank);
+				    	}
 				        var devices = [];
 				        for (var i = 0; i < e.Device.length; i++){
 				            var device = e.Device[i];
@@ -214,8 +192,10 @@ function selectDevice(e){
 				    }
 				});
 			} else {
-				//deviceWin.setLeftNavButton(backToDevices);
-				//if(admin == true) deviceWin.setRightNavButton(edit);
+				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+					deviceWin.setLeftNavButton(backToDevices);
+					if(admin == true) deviceWin.setRightNavButton(edit);
+				}
 				if (e.rowData.takenBy != undefined){
 					Cloud.Users.query({
 						where:{ id:e.rowData.takenBy }

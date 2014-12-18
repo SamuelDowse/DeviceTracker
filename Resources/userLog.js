@@ -17,6 +17,7 @@ function logIn(){
 					picker.remove(login);
 					picker.add(logout);
 					cameraWin.remove(loginWindow);
+					picker.startScanning();
 	    		} else {
 	    			alert('Incorrect Username/Password');
 	    		}
@@ -25,6 +26,7 @@ function logIn(){
 		
 		cancelButton.addEventListener("click", function() {
 			cameraWin.remove(loginWindow);
+			picker.startScanning();
 		});
 		
 		loginWindow.add(userName);
