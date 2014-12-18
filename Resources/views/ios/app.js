@@ -42,65 +42,75 @@ function beginiOS(){
 	backToPlatforms.addEventListener('singletap', function() {
 		// Populate the deviceList with all platforms
 		deviceList.setData(platforms);
-		// Set the leftNavButton to be blank
-		deviceWin.setLeftNavButton(blank);
+		// Set the leftNavButton to the backToCamera
+		cameraWin.setLeftNavButton(backToCamera);
 		// If the user is an admin
 		if(admin == true)
 			// Set the rightNavButton to the add button
-			deviceWin.setRightNavButton(add);
+			cameraWin.setRightNavButton(add);
 		else
 			// Set the rightNavButton to be blank
-			deviceWin.setRightNavButton(blank);
+			cameraWin.setRightNavButton(blank);
+	});
+	
+	// If the user clicks the backToPlatforms button
+	backToCamera.addEventListener('singletap', function() {
+		// Populate the deviceList with all platforms
+		deviceList.setData(platforms);
+		// Set the leftNavButton to be blank
+		cameraWin.setLeftNavButton(blank);
+		// Set the rightNavButton to be blank
+		cameraWin.setRightNavButton(blank);
 	});
 	
 	// If the user clicks the backToDevices button
 	backToDevices.addEventListener('singletap', function() {
 		// Remove the deviceWindow view
-		deviceWin.remove(deviceWindow);
+		cameraWin.remove(deviceWindow);
 		// Set the leftNavButton to the backToPlatforms button
-		deviceWin.setLeftNavButton(backToPlatforms);
+		cameraWin.setLeftNavButton(backToPlatforms);
 		// Set the rightNavButton to be blank
-		deviceWin.setRightNavButton(blank);
+		cameraWin.setRightNavButton(blank);
 	});
 	
 	// If the user clicks the backToDevice button
 	backToDevice.addEventListener('singletap', function() {
 		// Remove the editWindow view
-		deviceWin.remove(editWindow);
+		cameraWin.remove(editWindow);
 		// Set the leftNavButton to the backToDevices button
-		deviceWin.setLeftNavButton(backToDevices);
+		cameraWin.setLeftNavButton(backToDevices);
 		// If the user is an admin
 		if(admin == true)
 			// Set the rightNavButton to the edit button
-			deviceWin.setRightNavButton(edit);
+			cameraWin.setRightNavButton(edit);
 		else
 			// Set the rightNavButton to be blank
-			deviceWin.setRightNavButton(blank);
+			cameraWin.setRightNavButton(blank);
 	});
 	
 	// If the user clicks the closeAddWindow button
 	closeAddWindow.addEventListener('singletap', function() {
 		// Remove the adddWindow view
-		deviceWin.remove(addWindow);
+		cameraWin.remove(addWindow);
 		// Set the leftNavButton to be blank
-		deviceWin.setLeftNavButton(blank);
+		cameraWin.setLeftNavButton(blank);
 		// If the user is an admin
 		if(admin == true)
 			// Set the rightNavButton to the add button
-			deviceWin.setRightNavButton(add);
+			cameraWin.setRightNavButton(add);
 		else
 			// Set the rightNavButton to be blank
-			deviceWin.setRightNavButton(blank);
+			cameraWin.setRightNavButton(blank);
 	});
 	
 	// If the user clicks the edit button
 	edit.addEventListener('singletap', function() {
 		// Show the editWindow button
-		deviceWin.add(editWindow);
+		cameraWin.add(editWindow);
 		// Set the leftNavButton to the backToDevice button
-		deviceWin.setLeftNavButton(backToDevice);
+		cameraWin.setLeftNavButton(backToDevice);
 		// Set the rightNavButton to the save button
-		deviceWin.setRightNavButton(save);
+		cameraWin.setRightNavButton(save);
 	});
 	
 	// If the user clicks the add button
@@ -108,11 +118,11 @@ function beginiOS(){
 		// Set all the textfields to blank and display the addWindow
 		devicePlatformValue.setValue(null); deviceOSValue.setValue(null);
 		deviceModelValue.setValue(null); deviceNameValue.setValue(null);
-		deviceIMEIValue.setValue(null); deviceWin.add(addWindow);
+		deviceIMEIValue.setValue(null); cameraWin.add(addWindow);
 		// Set the leftNavButton to the closeAddWindow button
-		deviceWin.setLeftNavButton(closeAddWindow);
+		cameraWin.setLeftNavButton(closeAddWindow);
 		// Set the rightNavButton to the upload button
-		deviceWin.setRightNavButton(upload);
+		cameraWin.setRightNavButton(upload);
 	});
 	
 	// If the user clicks the upload button

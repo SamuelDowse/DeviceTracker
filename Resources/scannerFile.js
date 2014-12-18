@@ -6,24 +6,8 @@ var closeDeviceWin = function() {
     cameraWin.removeEventListener('androidback', closeDeviceWin);
     return false;
 };
-	
-function openScanner(){
-    picker = scanditsdk.createView({
-    	width:'100%',
-    	height:'100%'
-    });
-    picker.init('9VYuOmbDEeOdM21j18UUIGKVF9o+PtHC5XrXuXYCmjQ', 0);
-    picker.showSearchBar(true);
-    
-    picker.setSuccessCallback(function(e) {
-    	scannedDevices.push(e.barcode);
-    	Ti.Media.vibrate();
-    });
-    
-    picker.setCancelCallback(function(e) {
-    	closeScanner();
-    });
-	
+
+function setActionListeners(){
 	login.addEventListener('click', function() {
 		userLog.logIn();
 		picker.stopScanning();
@@ -42,6 +26,13 @@ function openScanner(){
 		scannedDevices = [];
 	});
 	
+	clear.addEventListener('click', function(){
+		if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
+			cameraWin.setRightNavButton(blank);
+		}
+		scannedDevices = []; uniqueDevices = [];
+	});
+	
 	listDevice.addEventListener('click', function() {
 		deviceFunctions.setMenu();
 		deviceList.setData(platforms);
@@ -49,14 +40,40 @@ function openScanner(){
 		cameraWin.add(deviceWin);
 		if (Ti.Platform.osname == 'android')
 			cameraWin.addEventListener('androidback', closeDeviceWin);
+		else
+			cameraWin.setLeftNavButton(backToCamera);
 		picker.stopScanning();
 	});
+}
 	
-	picker.startScanning();
-	picker.add(login);
+function openScanner(){
+    picker = scanditsdk.createView({
+    	width:'100%',
+    	height:'100%'
+    });
+    picker.init('9VYuOmbDEeOdM21j18UUIGKVF9o+PtHC5XrXuXYCmjQ', 0);
+    picker.showSearchBar(true);
+    
+    picker.setSuccessCallback(function(e) {
+    	scannedDevices.push(e.barcode);
+    	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
+    		cameraWin.setRightNavButton(clear);
+    	Ti.Media.vibrate();
+    });
+    
+    picker.setCancelCallback(function(e) {
+    	closeScanner();
+    });
+	
+	if (!loggedIn)
+		picker.add(login);
+	else
+		picker.add(logout);
 	picker.add(checkout);
 	picker.add(listDevice);
 	cameraWin.add(picker);
+	
+	picker.startScanning();
 }
 
 function checkoutDevice(){
@@ -112,6 +129,7 @@ function checkoutDevice(){
 				}
 			}
 		});
+		scannedDevices = null; uniqueDevices = null;
 	}
 }
 
@@ -202,15 +220,23 @@ function logCheckDevice(){
 				});
 			}
 		});
+		scannedDevices = null; uniqueDevices = null;
 	}
 }
 
 function closeScanner(){
 	if (picker != null) 
 		picker.stopScanning();
+	if (!loggedIn)
+		picker.remove(login);
+	else
+		picker.remove(logout);
+	picker.remove(checkout);
+	picker.remove(listDevice);
 	cameraWin.remove(picker);
 }
 
 // Export the following functions so they can be used outside of this file
+exports.setActionListeners = setActionListeners;
 exports.openScanner = openScanner;
 exports.closeScanner = closeScanner;

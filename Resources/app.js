@@ -27,7 +27,7 @@ var deviceOSValue		= Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText
 var devicePlatformValue	= Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform', color:'white'});
 var userName			= Ti.UI.createTextField({top:50, autocorrect:false, hintText:'Username', color:'white'});
 var userPassword		= Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password', color:'white'});
-var addWindow			= Ti.UI.createView({backgroundColor:'white', layout:'vertical'});
+var addWindow			= Ti.UI.createView({backgroundColor:'#484850', layout:'vertical'});
 var deviceWin			= Ti.UI.createView({title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00'});
 var deviceWindow		= Ti.UI.createView({backgroundColor:'#484850'});
 var editWindow			= Ti.UI.createView({backgroundColor:'#484850', layout:'vertical'});
@@ -42,13 +42,18 @@ var platforms			= [];
 var scannedDevices		= [];
 var cameraIndexField;
 var deviceIDValue;
+var currentUser;
 // GLOBAL VARIABLES \\
+// ANDROID SPECIFIC VARIABLES \\
+var editPage			= false;
+// ANDROID SPECIFIC VARIABLES \\
 // IOS SPECIFIC VARIABLES \\
 var add					= Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'});
 var backToDevice		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevices		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToPlatforms		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var blank				= Ti.UI.createButton({color:'white', backgroundImage:'none'});
+var clear				= Ti.UI.createButton({title:'Clear', color:'white', backgroundImage:'none'});
 var closeAddWindow		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var deleteDevice		= Ti.UI.createButton({title:'Delete', color:'white', backgroundImage:'none'});
 var edit				= Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'});
@@ -66,6 +71,14 @@ if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
 	alertDialog.show();
 }
 
+// Check the users device and load the correct UI
+if (Ti.Platform.osname == 'android')
+	androidSetUp.beginAndroid();
+else
+	iOSSetUp.beginiOS();
+	
+// Set action listeners for the scanner file
+scannerFile.setActionListeners();
 // Obtain all platforms
 deviceFunctions.getPlatforms();
 // Open the scanner and begin scanning
@@ -73,8 +86,3 @@ scannerFile.openScanner();
 // Open the camera view
 cameraWin.open();
 
-// Check the users device and load the correct UI
-if (Ti.Platform.osname == 'android')
-	androidSetUp.beginAndroid();
-else
-	iOSSetUp.beginiOS();
