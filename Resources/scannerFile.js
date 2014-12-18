@@ -1,9 +1,24 @@
 var closeDeviceWin = function() {
-	cameraWin.remove(deviceWin);
-	cameraWin.remove(deviceWindow);
+	if (listPage == true){
+		cameraWin.remove(deviceWin);
+		listPage = false;
+	}
+	if (devicePage == true){
+		cameraWin.remove(deviceWindow);
+		devicePage = false;
+	}
+	if (addPage == true){
+		cameraWin.remove(addWindow);
+		addPage = false;
+	}
+	if (editPage == true){
+		cameraWin.remove(editWindow);
+		editPage = false;
+	}
 	deviceList.setData(platforms);
 	picker.startScanning();
     cameraWin.removeEventListener('androidback', closeDeviceWin);
+    cameraWin.activity.invalidateOptionsMenu();
     return false;
 };
 
@@ -34,7 +49,6 @@ function setActionListeners(){
 	});
 	
 	listDevice.addEventListener('click', function() {
-		deviceFunctions.setMenu();
 		deviceList.setData(platforms);
 		deviceWin.add(deviceList);
 		cameraWin.add(deviceWin);
@@ -42,6 +56,8 @@ function setActionListeners(){
 			cameraWin.addEventListener('androidback', closeDeviceWin);
 		else
 			cameraWin.setLeftNavButton(backToCamera);
+		listPage = true;
+		cameraWin.activity.invalidateOptionsMenu();
 		picker.stopScanning();
 	});
 }

@@ -3,26 +3,35 @@
  * Everything visual outside of the scanning screen is set up in here.
  */
 function beginAndroid(){
-	var ADD = 1, REFRESH = 2;
+	var ADD = 1, REFRESH = 2, EDIT = 3;
 	
 	var activity = cameraWin.activity;
 	activity.onCreateOptionsMenu = function(e){
 		var menu = e.menu;
 		var addDevice = menu.add({title: "Add Device", itemId: ADD});
 		addDevice.addEventListener("click", function(e) {
-			cameraWin.add(addWindow);
+			devicePlatformValue.setValue(null); deviceOSValue.setValue(null);
+			deviceModelValue.setValue(null); deviceNameValue.setValue(null);
+			deviceIMEIValue.setValue(null); cameraWin.add(addWindow);
+			addPage = true;
 			picker.stopScanning();
 		});
 		var refreshDevices = menu.add({title: "Refresh Devices", itemId: REFRESH});
 		refreshDevices.addEventListener("click", function(e) {
 			deviceFunctions.getPlatforms();
 		});
+		var editDevice = menu.add({title: "Edit Device", itemId: EDIT});
+		editDevice.addEventListener("click", function(e) {
+			cameraWin.add(editWindow);
+			editPage = true;
+		});
 	};
 	
 	activity.onPrepareOptionsMenu = function(e) {
 		var menu = e.menu;
-		menu.findItem(ADD).setVisible(admin);
-		menu.findItem(REFRESH).setVisible(true);
+		menu.findItem(ADD).setVisible(admin && listPage);
+		menu.findItem(REFRESH).setVisible(listPage);
+		menu.findItem(EDIT).setVisible(admin && devicePage);
 	};
 	
 	//-- EDIT DEVICE WINDOW--\\
@@ -32,6 +41,7 @@ function beginAndroid(){
 	editWindow.add(deviceNameValue);
 	editWindow.add(deviceIMEIValue);
 	editWindow.add(takePhoto);
+	editWindow.add(save);
 	editWindow.add(deleteDevice);
 	//--EDIT DEVICE WINDOW--\\
 	//--ADD DEVICE WINDOW--\\
@@ -41,7 +51,7 @@ function beginAndroid(){
 	addWindow.add(deviceNameValue);
 	addWindow.add(deviceIMEIValue);
 	addWindow.add(takePhoto);
-	addWindow.add(save);
+	addWindow.add(upload);
 	//--ADD DEVICE WINDOW--\\
 	
 	// Add the deviceImage to the deviceWindow
@@ -57,16 +67,22 @@ function beginAndroid(){
 	});
 	
 	// If the user clicks the save button
-	save.addEventListener('singletap', function() {
+	upload.addEventListener('singletap', function() {
 		scannerFile.openScanner();
 		// Run hte saveDevice function
 		deviceFunctions.uploadDevice();
 	});
 	
-	// If the user clicks the edit button
-	edit.addEventListener('singletap', function() {
-		// Show the editWindow button
-		cameraWin.add(editWindow);
+	// If the user clicks the save button
+	save.addEventListener('singletap', function() {
+		// Run hte saveDevice function
+		deviceFunctions.saveDevice();
+	});
+	
+	// If the user clicks the deleteDevice button
+	deleteDevice.addEventListener('singletap', function() {
+		// Run the deleteDevice function
+		deviceFunctions.deleteDevice();
 	});
 	
 	// If the user taps on the deviceList

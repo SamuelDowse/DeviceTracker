@@ -48,6 +48,8 @@ function logIn(){
 			picker.startScanning();
 		});
 		
+		// Empty the fields of any data
+		userName.setValue(null); userPassword.setValue(null);
 		// Add the userName textfield to the loginWindow
 		loginWindow.add(userName);
 		// Add the userPassword textfield to the loginWindow

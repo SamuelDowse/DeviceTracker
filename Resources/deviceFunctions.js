@@ -48,13 +48,13 @@ function saveDevice(){
 		}
 	}, function (e) {
 		if (e.success){
-			deviceWin.remove(editWindow);
+			cameraWin.remove(editWindow);
 			if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-				deviceWin.setLeftNavButton(backToDevices);
+				cameraWin.setLeftNavButton(backToDevices);
 				if(admin == true)
-					deviceWin.setRightNavButton(edit);
+					cameraWin.setRightNavButton(edit);
 				else
-					deviceWin.setRightNavButton(blank);
+					cameraWin.setRightNavButton(blank);
 			}
 		} else {
 			alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -78,13 +78,13 @@ function uploadDevice(){
 		    }
 		}, function (e) {
 			if (e.success){
-				deviceWin.remove(addWindow);
+				cameraWin.remove(addWindow);
 				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-					deviceWin.setLeftNavButton(blank);
+					cameraWin.setLeftNavButton(blank);
 					if(admin == true)
-						deviceWin.setRightNavButton(add);
+						cameraWin.setRightNavButton(add);
 					else
-						deviceWin.setRightNavButton(blank);
+						cameraWin.setRightNavButton(blank);
 				}
 			} else {
 				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -111,11 +111,11 @@ function deleteDevice(){
 			id:deviceIDValue
 		}, function (e) {
 			if (e.success) {
-				deviceWin.remove(editWindow);
-				deviceWin.remove(deviceWindow);
+				cameraWin.remove(editWindow);
+				cameraWin.remove(deviceWindow);
 				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-					deviceWin.setLeftNavButton(backToPlatforms);
-					deviceWin.setRightNavButton(blank);
+					cameraWin.setLeftNavButton(backToPlatforms);
+					cameraWin.setRightNavButton(blank);
 				}
 			} else {
 				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -161,7 +161,7 @@ function selectDevice(e){
 		if (e.rowData != null){
 			if (e.rowData.platform == true){
 				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad")
-					deviceWin.setLeftNavButton(blank);
+					cameraWin.setLeftNavButton(blank);
 				Cloud.Objects.query({
 				    classname:'Device',
 				    order:"-osver, model",
@@ -170,8 +170,8 @@ function selectDevice(e){
 				}, function (e) {
 				    if (e.success) {
 				    	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-				    		deviceWin.setLeftNavButton(backToPlatforms);
-				    		deviceWin.setRightNavButton(blank);
+				    		cameraWin.setLeftNavButton(backToPlatforms);
+				    		cameraWin.setRightNavButton(blank);
 				    	}
 				        var devices = [];
 				        for (var i = 0; i < e.Device.length; i++){
@@ -194,11 +194,11 @@ function selectDevice(e){
 				});
 			} else {
 				if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-					deviceWin.setLeftNavButton(backToDevices);
+					cameraWin.setLeftNavButton(backToDevices);
 					if(admin == true)
-						deviceWin.setRightNavButton(edit);
+						cameraWin.setRightNavButton(edit);
 					else
-						deviceWin.setRightNavButton(blank);
+						cameraWin.setRightNavButton(blank);
 				}
 				if (e.rowData.takenBy != undefined){
 					Cloud.Users.query({
@@ -217,7 +217,8 @@ function selectDevice(e){
 				Cloud.Users.query({
 					where:{ id:takenByID }
 				}, function (a) {
-					if (a.success){    
+					if (a.success){
+						devicePage = true;
 						var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
 						deviceImage.setImage(deviceImageURL);
 						devicePlatformValue.setValue(e.rowData.platform);
@@ -227,28 +228,13 @@ function selectDevice(e){
 						deviceIMEIValue.setValue(e.rowData.imei);
 						deviceIDValue = e.rowData.id;
 						cameraWin.add(deviceWindow);
+						cameraWin.remove(deviceWin);
+						cameraWin.activity.invalidateOptionsMenu();
 					}
 				});
 			}
 		}
 	}
-}
-
-function setMenu(){
-	cameraWin.activity.onCreateOptionsMenu = function(e) {
-		var menu = e.menu;
-		menu.clear();
-		if (admin == true){
-			var item1 = menu.add({
-				title : 'Add Device',
-				showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
-			});
-		}
-		var item2 = menu.add({
-			title : 'Clear Scanned Devices',
-			showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
-		});
-	};
 }
 
 // Export the following functions so they can be used outside of this file
@@ -259,4 +245,3 @@ exports.uploadDevice = uploadDevice;
 exports.deleteDevice = deleteDevice;
 exports.deletePlatform = deletePlatform;
 exports.selectDevice = selectDevice;
-exports.setMenu = setMenu;

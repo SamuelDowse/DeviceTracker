@@ -44,10 +44,7 @@ var cameraIndexField;
 var deviceIDValue;
 var currentUser;
 // GLOBAL VARIABLES \\
-// ANDROID SPECIFIC VARIABLES \\
-var editPage			= false;
-// ANDROID SPECIFIC VARIABLES \\
-// IOS SPECIFIC VARIABLES \\
+// OS SPECIFIC VARIABLES \\
 var add					= Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'});
 var backToDevice		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevices		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
@@ -55,12 +52,17 @@ var backToPlatforms		= Ti.UI.createButton({title:'Back', color:'white', backgrou
 var blank				= Ti.UI.createButton({color:'white', backgroundImage:'none'});
 var clear				= Ti.UI.createButton({title:'Clear', color:'white', backgroundImage:'none'});
 var closeAddWindow		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
-var deleteDevice		= Ti.UI.createButton({title:'Delete', color:'white', backgroundImage:'none'});
+var deleteDevice		= Ti.UI.createButton({title:'Delete', color:'red', backgroundImage:'none'});
 var edit				= Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'});
 var save				= Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'});
 var toDevices			= Ti.UI.createButton({title:'Devices', color:'white', backgroundImage:'none'});
 var upload				= Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'});
-// IOS SPECIFIC VARIABLES \\
+
+var addPage				= false;
+var devicePage			= false;
+var editPage			= false;
+var listPage			= false;
+// OS SPECIFIC VARIABLES \\
 
 // Check for a network connection
 if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
