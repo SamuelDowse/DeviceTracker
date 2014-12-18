@@ -12,14 +12,11 @@ function logIn(){
 				password: userPassword.value
 			}, function (e) {
 	    		if (e.success) {
-	        		var user = e.users[0];
-	        		cameraWin.remove(loginWindow);
-					scannerFile.openScanner();
 					loggedIn = true;
-					if (user.admin == 'true')
-						admin = true;
+					if (e.users[0].admin == 'true') admin = true;
+					picker.remove(login);
+					picker.add(logout);
 					cameraWin.remove(loginWindow);
-					scannerFile.openScanner();
 	    		} else {
 	    			alert('Incorrect Username/Password');
 	    		}
@@ -28,7 +25,6 @@ function logIn(){
 		
 		cancelButton.addEventListener("click", function() {
 			cameraWin.remove(loginWindow);
-			scannerFile.openScanner();
 		});
 		
 		loginWindow.add(userName);
@@ -42,18 +38,14 @@ function logOut(){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Users.logout(function (e) {
 			if (e.success) {
-				var logoutDialog = Ti.UI.createAlertDialog({
-					message: 'You have been logged out',
-					title: 'Logged Out'
-				});
-				logoutDialog.show();
-				var user = null;
+				picker.remove(logout);
+				picker.add(login);
+				loggedIn = false;
+				admin = false;
 			} else {
 				alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
 			}
 		});
-		loggedIn = false;
-		admin = false;
 	}
 }
 exports.logIn = logIn;
