@@ -67,7 +67,7 @@ function uploadDevice(){
 		if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		Cloud.Objects.create({
 			classname:'Device',
-			acl_name:'Platforms',
+			acl_name:'AllAccess',
 			photo:photo,
 			fields:{
 		        name:deviceNameValue.value,
@@ -95,7 +95,7 @@ function uploadDevice(){
 			Ti.API.info("OS already exists, ignoring creation of OS in ACS");
 		} else {
 			Cloud.Objects.create({
-				classname:'Platforms',acl_name:'Platforms',fields:{platform:devicePlatformValue.value}
+				classname:'Platforms',acl_name:'AllAccess',fields:{platform:devicePlatformValue.value}
 			}, function (e) {
 				if (!e.success)
 					alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
@@ -229,7 +229,8 @@ function selectDevice(e){
 						deviceIDValue = e.rowData.id;
 						cameraWin.add(deviceWindow);
 						cameraWin.remove(deviceWin);
-						cameraWin.activity.invalidateOptionsMenu();
+						if (Ti.Platform.osname == 'android')
+							cameraWin.activity.invalidateOptionsMenu();
 					}
 				});
 			}

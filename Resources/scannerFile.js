@@ -54,10 +54,11 @@ function setActionListeners(){
 		cameraWin.add(deviceWin);
 		if (Ti.Platform.osname == 'android')
 			cameraWin.addEventListener('androidback', closeDeviceWin);
-		else
+		else {
 			cameraWin.setLeftNavButton(backToCamera);
+			cameraWin.activity.invalidateOptionsMenu();
+		}
 		listPage = true;
-		cameraWin.activity.invalidateOptionsMenu();
 		picker.stopScanning();
 	});
 }
@@ -72,8 +73,11 @@ function openScanner(){
     
     picker.setSuccessCallback(function(e) {
     	scannedDevices.push(e.barcode);
+    	scanned = true;
     	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
     		cameraWin.setRightNavButton(clear);
+    	else 
+    		cameraWin.activity.invalidateOptionsMenu();
     	Ti.Media.vibrate();
     });
     
@@ -94,65 +98,61 @@ function openScanner(){
 
 function checkoutDevice(){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-		Cloud.Users.showMe(function (e) {
-			if (e.success) {
-				var user = e.users[0];
-				for (var a = 0; a < uniqueDevices.length; a++) {
-					Cloud.Objects.query({
-						classname: 'Device',
-						where: {imei: uniqueDevices[a]}
-					}, function (e) {
-						if (e.success) {
-							for (var i = 0; i < e.Device.length; i++) {
-								var device = e.Device[i];
-								switch (device.taken_by){
-									case user.id:
-										Cloud.Objects.update({
-											classname: 'Device',
-											id: device.id,
-											fields: { taken_by: null }
-										}, function (e) {
-											if (e.success) {
-												var unlinkDialog = Ti.UI.createAlertDialog({
-													message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name
-													});
-												unlinkDialog.show();
-											} else {
-												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-											}
+		for (var a = 0; a < uniqueDevices.length; a++) {
+			Cloud.Objects.query({
+				classname: 'Device',
+				where: {imei: uniqueDevices[a]}
+			}, function (e) {
+				if (e.success) {
+					for (var i = 0; i < e.Device.length; i++) {
+						var device = e.Device[i];
+						switch (device.taken_by){
+							case currentUser.id:
+								Cloud.Objects.update({
+									classname: 'Device',
+									id: device.id,
+									fields: { taken_by: null }
+								}, function (e) {
+									if (e.success) {
+										var unlinkDialog = Ti.UI.createAlertDialog({
+											message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name
+											});
+										unlinkDialog.show();
+									} else {
+										alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+									}
+								});
+								break;
+							default:
+								Cloud.Objects.update({
+									classname: 'Device',
+									id: device.id,
+									fields: { taken_by: currentUser.id }
+								}, function (e) {
+									if (e.success) {
+										var linkDialog = Ti.UI.createAlertDialog({
+											message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+currentUser.first_name+' '+currentUser.last_name
 										});
-										break;
-									default:
-										Cloud.Objects.update({
-											classname: 'Device',
-											id: device.id,
-											fields: { taken_by: user.id }
-										}, function (e) {
-											if (e.success) {
-												var linkDialog = Ti.UI.createAlertDialog({
-													message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name
-												});
-												linkDialog.show();
-											} else {
-												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-											}
-										});
-										break;
-								}
-			        		}
-			    		}
-					});
-				}
-			}
-		});
+										linkDialog.show();
+									} else {
+										alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+									}
+								});
+								break;
+						}
+	        		}
+	    		}
+			});
+		}
 		scannedDevices = null; uniqueDevices = null;
 	}
 }
 
 function logCheckDevice(){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-		Cloud.Users.login({login:'assigner',password:'tester'}, function (e) { 
+		Cloud.Users.login({login:'assigner', password:'tester'}, function (e) { 
 			if (e.success) {
+				loggedIn = true;
 				Cloud.Users.query({
 				    where:{id: uniqueDevices[0]}
 				}, function (e) {
@@ -201,7 +201,9 @@ function logCheckDevice(){
 												break;
 										}
 					        		}
-					        		Cloud.Users.logout(function (e) {});
+					        		Cloud.Users.logout(function (e) {
+					        			loggedIn = false;
+					        		});
 					    		}
 							});
 						}

@@ -3,7 +3,7 @@
  * Everything visual outside of the scanning screen is set up in here.
  */
 function beginAndroid(){
-	var ADD = 1, REFRESH = 2, EDIT = 3;
+	var ADD = 1, REFRESH = 2, EDIT = 3, CLEAR = 4;
 	
 	var activity = cameraWin.activity;
 	activity.onCreateOptionsMenu = function(e){
@@ -25,6 +25,11 @@ function beginAndroid(){
 			cameraWin.add(editWindow);
 			editPage = true;
 		});
+		var clearScanned = menu.add({title: "Clear Scanned", itemId: CLEAR});
+		clearScanned.addEventListener("click", function(e) {
+			scannedDevices = []; uniqueDevices = []; scanned = false;
+			cameraWin.activity.invalidateOptionsMenu();
+		});
 	};
 	
 	activity.onPrepareOptionsMenu = function(e) {
@@ -32,6 +37,7 @@ function beginAndroid(){
 		menu.findItem(ADD).setVisible(admin && listPage);
 		menu.findItem(REFRESH).setVisible(listPage);
 		menu.findItem(EDIT).setVisible(admin && devicePage);
+		menu.findItem(CLEAR).setVisible(!devicePage && !listPage && !addPage && !editPage && scanned);
 	};
 	
 	//-- EDIT DEVICE WINDOW--\\

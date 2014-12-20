@@ -35,6 +35,7 @@ var loginWindow			= Ti.UI.createView({backgroundColor:"#484850", layout:"vertica
 var cameraWin			= Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00'});
 var admin				= false;
 var loggedIn			= false;
+var scanned				= false;
 var photo				= null;
 var allPlatforms		= [];
 var currentPlatforms	= [];
