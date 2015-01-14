@@ -1,20 +1,9 @@
 var closeDeviceWin = function() {
-	if (listPage == true){
-		cameraWin.remove(deviceWin);
-		listPage = false;
-	}
-	if (devicePage == true){
-		cameraWin.remove(deviceWindow);
-		devicePage = false;
-	}
-	if (addPage == true){
-		cameraWin.remove(addWindow);
-		addPage = false;
-	}
-	if (editPage == true){
-		cameraWin.remove(editWindow);
-		editPage = false;
-	}
+	if (listPage == true) cameraWin.remove(deviceWin);
+	if (devicePage == true) cameraWin.remove(deviceWindow);
+	if (addPage == true) cameraWin.remove(addWindow);
+	if (editPage == true) cameraWin.remove(editWindow);
+	addPage = false; devicePage = false; editPage = false; listPage = false;
 	deviceList.setData(platforms);
 	picker.startScanning();
     cameraWin.removeEventListener('androidback', closeDeviceWin);
@@ -34,17 +23,14 @@ function setActionListeners(){
 	
 	checkout.addEventListener('click', function() {
 		uniqueDevices = scannedDevices.filter(function(elem, pos) { return scannedDevices.indexOf(elem) == pos; });
-		if (loggedIn == true)
-			checkoutDevice();
-		else
-			logCheckDevice();
-		scannedDevices = [];
+		scannedDevices = []; scanned = false;
+		if (Ti.Platform.osname == 'android') cameraWin.activity.invalidateOptionsMenu();
+		((loggedIn) ? deviceFunctions.checkoutDevice() : deviceFunctions.logCheckDevice());
 	});
 	
 	clear.addEventListener('click', function(){
-		if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
+		if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
 			cameraWin.setRightNavButton(blank);
-		}
 		scannedDevices = []; uniqueDevices = [];
 	});
 	
@@ -52,206 +38,44 @@ function setActionListeners(){
 		deviceList.setData(platforms);
 		deviceWin.add(deviceList);
 		cameraWin.add(deviceWin);
-		if (Ti.Platform.osname == 'android')
+		if (Ti.Platform.osname == 'android') {
 			cameraWin.addEventListener('androidback', closeDeviceWin);
-		else {
-			cameraWin.setLeftNavButton(backToCamera);
 			cameraWin.activity.invalidateOptionsMenu();
+		} else {
+			cameraWin.setLeftNavButton(backToCamera);
 		}
 		listPage = true;
 		picker.stopScanning();
 	});
+	
+	cameraWin.addEventListener('focus', function(){
+		// Obtain all platforms
+		deviceFunctions.getPlatforms();
+		// Obtain all devices
+		deviceFunctions.getDevices();
+	});
 }
 	
 function openScanner(){
-    picker = scanditsdk.createView({
-    	width:'100%',
-    	height:'100%'
-    });
+    picker = scanditsdk.createView({width:'100%', height:'100%'});
     picker.init('9VYuOmbDEeOdM21j18UUIGKVF9o+PtHC5XrXuXYCmjQ', 0);
     picker.showSearchBar(true);
     
     picker.setSuccessCallback(function(e) {
-    	scannedDevices.push(e.barcode);
-    	scanned = true;
-    	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
-    		cameraWin.setRightNavButton(clear);
-    	else 
-    		cameraWin.activity.invalidateOptionsMenu();
-    	Ti.Media.vibrate();
+    	scannedDevices.push(e.barcode); scanned = true; Ti.Media.vibrate();
+    	((Ti.Platform.osname == 'android') ? cameraWin.activity.invalidateOptionsMenu() : cameraWin.setRightNavButton(clear));
     });
-    
-    picker.setCancelCallback(function(e) {
-    	closeScanner();
-    });
+    picker.setCancelCallback(function(e) { closeScanner(); });
 	
-	if (!loggedIn)
-		picker.add(login);
-	else
-		picker.add(logout);
-	picker.add(checkout);
-	picker.add(listDevice);
-	cameraWin.add(picker);
-	
+	((!loggedIn) ? picker.add(login) : picker.add(logout));
+	picker.add(checkout); picker.add(listDevice); cameraWin.add(picker);
 	picker.startScanning();
 }
 
-function checkoutDevice(){
-	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-		for (var a = 0; a < uniqueDevices.length; a++) {
-			Cloud.Objects.query({
-				classname: 'Device',
-				where: {imei: uniqueDevices[a]}
-			}, function (e) {
-				if (e.success) {
-					for (var i = 0; i < e.Device.length; i++) {
-						var device = e.Device[i];
-						switch (device.taken_by){
-							case currentUser.id:
-								Cloud.Objects.update({
-									classname: 'Device',
-									id: device.id,
-									fields: { taken_by: null }
-								}, function (e) {
-									if (e.success) {
-										var unlinkDialog = Ti.UI.createAlertDialog({
-											message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name
-											});
-										unlinkDialog.show();
-									} else {
-										alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-									}
-								});
-								break;
-							default:
-								Cloud.Objects.update({
-									classname: 'Device',
-									id: device.id,
-									fields: { taken_by: currentUser.id }
-								}, function (e) {
-									if (e.success) {
-										var linkDialog = Ti.UI.createAlertDialog({
-											message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+currentUser.first_name+' '+currentUser.last_name
-										});
-										linkDialog.show();
-									} else {
-										alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-									}
-								});
-								break;
-						}
-	        		}
-	    		}
-			});
-		}
-		scannedDevices = null; uniqueDevices = null;
-	}
-}
-
-function logCheckDevice(){
-	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-		Cloud.Users.login({login:'assigner', password:'tester'}, function (e) { 
-			if (e.success) {
-				loggedIn = true;
-				Cloud.Users.query({
-				    where:{id: uniqueDevices[0]}
-				}, function (e) {
-				    if (e.success) {
-				    	var user = e.users[0];
-				    	for (var a = 1; a < uniqueDevices.length; a++) {
-							Cloud.Objects.query({
-								classname: 'Device',
-								where: {imei: uniqueDevices[a]}
-							}, function (e) {
-								if (e.success) {
-									for (var i = 0; i < e.Device.length; i++) {
-										var device = e.Device[i];
-										switch (device.taken_by){
-											case user.id:
-												Cloud.Objects.update({
-													classname: 'Device',
-													id: device.id,
-													fields: {taken_by:null}
-												}, function (e) {
-													if (e.success) {
-														var unlinkDialog = Ti.UI.createAlertDialog({
-															message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name
-														});
-														unlinkDialog.show();
-													} else {
-														alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-													}
-												});
-												break;
-											default:
-												Cloud.Objects.update({
-													classname: 'Device',
-													id: device.id,
-													fields: { taken_by:uniqueDevices[0]}
-												}, function (e) {
-													if (e.success) {
-														var linkDialog = Ti.UI.createAlertDialog({
-															message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name
-														});
-														linkDialog.show();
-													} else {
-														alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-													}
-												});
-												break;
-										}
-					        		}
-					        		Cloud.Users.logout(function (e) {
-					        			loggedIn = false;
-					        		});
-					    		}
-							});
-						}
-				    } else {
-				    	for (var a = 0; a < uniqueDevices.length; a++) {
-				    		Cloud.Objects.query({
-								classname: 'Device',
-								where: {imei: uniqueDevices[a]}
-							}, function (e) {
-								if (e.success) {
-									for (var i = 0; i < e.Device.length; i++) {
-										var device = e.Device[i];
-										Cloud.Objects.update({
-											classname: 'Device',
-											id: device.id,
-											fields: {taken_by:null}
-										}, function (e) {
-											if (e.success) {
-												var unlinkDialog = Ti.UI.createAlertDialog({
-													message: 'Unlinking Device From User'
-												});
-												unlinkDialog.show();
-											} else {
-												alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-											}
-										});
-					        		}
-					    		}
-							});
-						}
-				    }
-				});
-			}
-		});
-		scannedDevices = null; uniqueDevices = null;
-	}
-}
-
 function closeScanner(){
-	if (picker != null) 
-		picker.stopScanning();
-	if (!loggedIn)
-		picker.remove(login);
-	else
-		picker.remove(logout);
-	picker.remove(checkout);
-	picker.remove(listDevice);
-	cameraWin.remove(picker);
+	if (picker != null) picker.stopScanning();
+	((!loggedIn) ? picker.remove(login) : picker.remove(logout));
+	picker.remove(checkout); picker.remove(listDevice); cameraWin.remove(picker);
 }
 
 // Export the following functions so they can be used outside of this file

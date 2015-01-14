@@ -19,6 +19,7 @@ function beginAndroid(){
 		var refreshDevices = menu.add({title: "Refresh Devices", itemId: REFRESH});
 		refreshDevices.addEventListener("click", function(e) {
 			deviceFunctions.getPlatforms();
+			deviceFunctions.getDevices();
 		});
 		var editDevice = menu.add({title: "Edit Device", itemId: EDIT});
 		editDevice.addEventListener("click", function(e) {

@@ -1,8 +1,8 @@
-#appname: DeviceTracker
-#publisher: Samuel
-#url: http://
-#image: appicon.png
-#appid: com.appcelerator.devicetracker
-#desc: undefined
-#type: mobile
-#guid: ff84cb6d-5f3a-4b28-8c17-f7377ae1b618
+#appname:DeviceTracker
+#publisher:Samuel Dowse
+#url:http://www.appcelerator.com
+#image:appicon.png
+#appid:com.appcelerator.devicetracker
+#desc:undefined
+#type:mobile
+#guid:ff84cb6d-5f3a-4b28-8c17-f7377ae1b618
