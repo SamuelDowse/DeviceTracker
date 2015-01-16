@@ -41,31 +41,6 @@ function beginAndroid(){
 		menu.findItem(CLEAR).setVisible(!devicePage && !listPage && !addPage && !editPage && scanned);
 	};
 	
-	//-- EDIT DEVICE WINDOW--\\
-	editWindow.add(devicePlatformValue);
-	editWindow.add(deviceOSValue);
-	editWindow.add(deviceModelValue);
-	editWindow.add(deviceNameValue);
-	editWindow.add(deviceIMEIValue);
-	editWindow.add(takePhoto);
-	editWindow.add(save);
-	editWindow.add(deleteDevice);
-	//--EDIT DEVICE WINDOW--\\
-	//--ADD DEVICE WINDOW--\\
-	addWindow.add(devicePlatformValue);
-	addWindow.add(deviceOSValue);
-	addWindow.add(deviceModelValue);
-	addWindow.add(deviceNameValue);
-	addWindow.add(deviceIMEIValue);
-	addWindow.add(takePhoto);
-	addWindow.add(upload);
-	//--ADD DEVICE WINDOW--\\
-	
-	// Add the deviceImage to the deviceWindow
-	deviceWindow.add(deviceImage);
-	// Add the deviceInfo to the deviceWindow
-	deviceWindow.add(deviceInfo);
-	
 	// If the user clicks the takePhoto button
 	takePhoto.addEventListener('click', function (evt){
 		scannerFile.closeScanner();

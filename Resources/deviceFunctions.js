@@ -10,6 +10,43 @@ function addPicture(evt){
 	});
 }
 
+function call(method, url, data, callback){
+	var xhr = new XMLHttpRequest(),
+	queryString = '&';
+	
+	xhr.onreadystatechange = function(){
+		if(xhr.readyState == 4){
+			try {
+				var data = JSON.parse(xhr.responseText);
+			} catch(error) {
+				var err = new Error((xhr.responseText ? 'Invalid' : 'Empty') + ' response from server.');
+				err.originalMessage = error.message;
+				err.responseText = xhr.responseText;
+				err.status = xhr.status;
+				callback(err);
+				return;
+			}
+			data.success = data.meta.success;
+			callback(null, data);
+		}
+	};
+	
+	if(method == 'GET' || method == 'DELETE'){
+		for(var field in data){
+			queryString += encodeURIComponent(field) + '=';
+			var value = typeof data[field] == 'object' ? JSON.stringify(data[field]) : data[field];
+			queryString += encodeURIComponent(value) + '&';
+		}
+		data = null;
+	} else {
+		data = JSON.stringify(data);
+	}
+	
+	xhr.open(method, "https://api.cloud.appcelerator.com/v1/"+url+".json?key=TIRHj6F5MQOuR1BYba7GdnJOAOq6IaP3"+queryString);
+	xhr.setRequestHeader('Content-type', 'application/json');
+	xhr.send(data);
+}
+
 function checkoutDevice(){
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		for (var a = 0; a < uniqueDevices.length; a++){
@@ -109,6 +146,7 @@ function deletePlatform(e){
 function getPlatforms() {
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		platforms = [];
+		uniquePlatforms = [];
 		Cloud.Objects.query({
 			classname:'Platforms',
 			order:'platform'
@@ -117,7 +155,6 @@ function getPlatforms() {
 				var devPlat = e.Platforms[i];
 				if (e.success){
 					platforms.push({title:devPlat.platform, name:devPlat.platform, color:'white', platform:true, id:devPlat.id});
-					currentPlatforms.push(devPlat.platform);
 				}
 			}
 			uniquePlatforms = platforms.filter(function(elem, pos) { return platforms.indexOf(elem) == pos; });
@@ -368,6 +405,7 @@ function uploadDevice(){
 
 // Export the following functions so they can be used outside of this file
 exports.addPicture = addPicture;
+exports.call = call;
 exports.checkoutDevice = checkoutDevice;
 exports.deleteDevice = deleteDevice;
 exports.deletePlatform = deletePlatform;

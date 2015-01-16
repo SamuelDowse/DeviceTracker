@@ -49,6 +49,7 @@ function setActionListeners(){
 	});
 	
 	cameraWin.addEventListener('focus', function(){
+		devices = []; platforms = []; uniquePlatforms = [];
 		// Obtain all platforms
 		deviceFunctions.getPlatforms();
 		// Obtain all devices

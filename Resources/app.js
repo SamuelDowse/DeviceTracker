@@ -22,7 +22,8 @@ var deviceImage			= Ti.UI.createImageView({top:20, bottom:20, height:'50%'});
 
 var deviceInfo			= Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%', color:'white'});
 
-var search				= Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0});
+if (Ti.Platform.osname != 'mobileweb')
+	var search			= Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0});
 
 var deviceList			= Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
 
@@ -91,6 +92,30 @@ if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
 	alertDialog.show();
 }
 
+//-- EDIT DEVICE WINDOW--\\
+editWindow.add(devicePlatformValue);
+editWindow.add(deviceOSValue);
+editWindow.add(deviceModelValue);
+editWindow.add(deviceNameValue);
+editWindow.add(deviceIMEIValue);
+editWindow.add(takePhoto);
+editWindow.add(save);
+editWindow.add(deleteDevice);
+//--EDIT DEVICE WINDOW--\\
+//--ADD DEVICE WINDOW--\\
+addWindow.add(devicePlatformValue);
+addWindow.add(deviceOSValue);
+addWindow.add(deviceModelValue);
+addWindow.add(deviceNameValue);
+addWindow.add(deviceIMEIValue);
+addWindow.add(takePhoto);
+addWindow.add(upload);
+//--ADD DEVICE WINDOW--\\
+//--DISPLAY DEVICE WINDOW--\\
+deviceWindow.add(deviceImage);
+deviceWindow.add(deviceInfo);
+//--DISPLAY DEVICE WINDOW--\\
+
 // Set action listeners for the scanner file
 scannerFile.setActionListeners();
 
@@ -99,9 +124,12 @@ if (Ti.Platform.osname == 'android')
 	androidSetUp.beginAndroid();
 else if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
 	iOSSetUp.beginiOS();
+else 
+	mobileWebSetUp.beginMobileWeb();
+	
+if (Ti.Platform.osname != 'mobileweb')
+	scannerFile.openScanner();
 
-// Start the scanner	
-scannerFile.openScanner();
 // Open the camera view
 cameraWin.open();
 
