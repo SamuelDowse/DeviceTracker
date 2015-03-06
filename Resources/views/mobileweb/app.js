@@ -7,15 +7,19 @@ function beginMobileWeb(){
 	deviceWindow.add(deviceImage);
 	// Add the deviceInfo to the deviceWindow
 	deviceWindow.add(deviceInfo);
+	backToHome.addEventListener('click', function(e){
+		deviceList.setData(uniquePlatforms);
+		cameraWin.remove(deviceWindow);
+	});
+	deviceWindow.add(backToHome);
 	
 	if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
 		deviceFunctions.call("GET", "objects/Platforms/query", null, function(err, data){
 			var numberOfPlatforms = data.response.Platforms;
 			var platformCount = 0;
 			for (currentPlatforms in numberOfPlatforms){
-				if(numberOfPlatforms.hasOwnProperty(currentPlatforms)){
+				if(numberOfPlatforms.hasOwnProperty(currentPlatforms))
 					platformCount++;
-				}
 			}
 			for (i = 0; i < platformCount; i++){
 				platforms.push({title:numberOfPlatforms[i].platform, name:numberOfPlatforms[i].platform, color:'white', platform:true, id:numberOfPlatforms[i].id});
@@ -29,9 +33,8 @@ function beginMobileWeb(){
 			var numberOfDevices = data.response.Device;
 			var deviceCount = 0;
 			for (currentDevices in numberOfDevices){
-				if(numberOfDevices.hasOwnProperty(currentDevices)){
+				if(numberOfDevices.hasOwnProperty(currentDevices))
 					deviceCount++;
-				}
 			}
 			for (i = 0; i < deviceCount; i++){
 				devices.push({title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')', model:numberOfDevices[i].model, name:numberOfDevices[i].name, imei:numberOfDevices[i].imei, platform:numberOfDevices[i].platform, osver:numberOfDevices[i].osver, takenBy:numberOfDevices[i].taken_by, image:numberOfDevices[i].photo, id:numberOfDevices[i].id, color:'white'});
@@ -46,9 +49,8 @@ function beginMobileWeb(){
 				if (e.rowData.platform == true){
 					var selectedPlatform = [];
 					for (var a = 0; a < devices.length; a++){
-						if (devices[a].platform == e.rowData.name){
+						if (devices[a].platform == e.rowData.name)
 							selectedPlatform.push(devices[a]);
-						}
 					}
 					deviceList.setData(selectedPlatform);
 				} else {

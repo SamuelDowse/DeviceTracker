@@ -67,6 +67,7 @@ var platformToRemove;
 var add					= Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'});
 var backToDevice		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevices		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
+var backToHome			= Ti.UI.createButton({title:'Back', bottom: '2%'});
 var backToPlatforms		= Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var blank				= Ti.UI.createButton({color:'white', backgroundImage:'none'});
 var clear				= Ti.UI.createButton({title:'Clear', color:'white', backgroundImage:'none'});
@@ -120,15 +121,15 @@ deviceWindow.add(deviceInfo);
 scannerFile.setActionListeners();
 
 // Check the users device and load the correct UI
-if (Ti.Platform.osname == 'android')
-	androidSetUp.beginAndroid();
-else if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
-	iOSSetUp.beginiOS();
-else 
-	mobileWebSetUp.beginMobileWeb();
-	
-if (Ti.Platform.osname != 'mobileweb')
-	scannerFile.openScanner();
+switch(Ti.Platform.osname){
+	case('android'): androidSetUp.beginAndroid(); break;
+	case('iphone'): iOSSetUp.beginiOS(); break;
+	case('ipad'): iOSSetUp.beginiOS(); break;
+	case('mobileweb'): mobileWebSetUp.beginMobileWeb(); break;
+	default: alert('Unsupported Platform!'); break;
+}
+
+if (Ti.Platform.osname != 'mobileweb') scannerFile.openScanner();
 
 // Open the camera view
 cameraWin.open();
