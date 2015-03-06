@@ -7,8 +7,11 @@
     <version>1.0</version>
     <publisher>Samuel Dowse</publisher>
     <url>http://www.appcelerator.com</url>
-    <description/>
-    <copyright>2014 by Samuel Dowse</copyright>
+    <description>This project was created with the idea that we could keep track of all Appcelerator test devices.&#xd;
+Each device has it's own unique barcode and each user/developer has their own unique barcode.&#xd;
+&#xd;
+The barcodes supported by the scanner are: EAN, UPC and QR codes</description>
+    <copyright>2015 by Samuel Dowse</copyright>
     <icon>appicon.png</icon>
     <fullscreen>false</fullscreen>
     <navbar-hidden>false</navbar-hidden>
