@@ -1,14 +1,22 @@
 // Set the background color of the application
 Ti.UI.setBackgroundColor('#484850');
 // GLOBAL VARIABLES \\
-var androidSetUp        = require('views/android/app');
-var Cloud               = require('ti.cloud');
-var deviceFunctions     = require('deviceFunctions');
-var iOSSetUp            = require('views/ios/app');
-var mobileWebSetUp      = require('views/mobileweb/app');
-var scanditsdk          = require('com.mirasense.scanditsdk');
+if (Ti.Platform.osname == 'android'){
+    var androidSetUp    = require('views/android/app');
+}
+if (Ti.Platform.osname != 'mobileweb'){
+    var Cloud           = require('ti.cloud');
+    var scanditsdk      = require('com.mirasense.scanditsdk');
+}
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
+    var iOSSetUp        = require('views/ios/app');
+}
+if (Ti.Platform.osname == 'mobileweb'){
+    var mobileWebSetUp  = require('views/mobileweb/app');
+}
 var scannerFile         = require('scannerFile');
 var userLog             = require('userLog');
+var deviceFunctions     = require('deviceFunctions');
 
 var checkout            = Ti.UI.createButton({backgroundImage:'assets/capture.png', bottom:'6%', width:60, height:60});
 var cancelButton        = Ti.UI.createButton({title:"Cancel", top:30, color:'white'});
@@ -20,7 +28,7 @@ var takePhoto           = Ti.UI.createButton({title:'Take Photo of Device', top:
 
 var deviceImage         = Ti.UI.createImageView({top:20, bottom:20, height:'50%'});
 
-var deviceInfo          = Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'50%', height:'50%', color:'white'});
+var deviceInfo          = Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'51%', height:'50%', color:'white'});
 
 if (Ti.Platform.osname != 'mobileweb')
     var search          = Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0});
@@ -54,7 +62,9 @@ var currentPlatforms    = [];
 var devices             = [];
 var platforms           = [];
 var scannedDevices      = [];
+var scannedUsers        = [];
 var uniqueDevices       = [];
+var uniqueUsers         = [];
 var uniquePlatforms     = [];
 
 var cameraIndexField;
@@ -122,14 +132,25 @@ scannerFile.setActionListeners();
 
 // Check the users device and load the correct UI
 switch(Ti.Platform.osname){
-    case('android'): androidSetUp.beginAndroid(); break;
-    case('iphone'): iOSSetUp.beginiOS(); break;
-    case('ipad'): iOSSetUp.beginiOS(); break;
-    case('mobileweb'): mobileWebSetUp.beginMobileWeb(); break;
-    default: alert('Unsupported Platform!'); break;
+    case('android'):
+        androidSetUp.beginAndroid();
+        break;
+    case('iphone'):
+        iOSSetUp.beginiOS();
+        break;
+    case('ipad'):
+        iOSSetUp.beginiOS();
+        break;
+    case('mobileweb'):
+        mobileWebSetUp.beginMobileWeb();
+        break;
+    default:
+        alert('Unsupported Platform!');
+        break;
 }
 
-if (Ti.Platform.osname != 'mobileweb') scannerFile.openScanner();
+if (Ti.Platform.osname != 'mobileweb')
+    scannerFile.openScanner();
 
 // Open the camera view
 cameraWin.open();

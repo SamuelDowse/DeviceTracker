@@ -3,6 +3,7 @@
  * Everything visual outside of the scanning screen is set up in here.
  */
 function beginMobileWeb(){
+	var alternateImage = false;
     // Add the deviceImage to the deviceWindow
     deviceWindow.add(deviceImage);
     // Add the deviceInfo to the deviceWindow
@@ -29,7 +30,7 @@ function beginMobileWeb(){
             cameraWin.add(deviceList);
         });
         
-        deviceFunctions.call("GET", "objects/Device/query", null, function(err, data){
+        deviceFunctions.call("GET", "objects/Device/query", {"limit":1000}, function(err, data){
             var numberOfDevices = data.response.Device;
             var deviceCount = 0;
             for (currentDevices in numberOfDevices){
@@ -43,7 +44,7 @@ function beginMobileWeb(){
     }
     
     // If the user taps on the deviceList
-    deviceList.addEventListener('singletap', function(e){
+    deviceList.addEventListener('click', function(e){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
             if (e.rowData != null){
                 if (e.rowData.platform == true){
@@ -74,17 +75,18 @@ function beginMobileWeb(){
                         deviceNameValue.setValue(e.rowData.name);
                         deviceIMEIValue.setValue(e.rowData.imei);
                         deviceIDValue = e.rowData.id;
+                        deviceImage.addEventListener('click', function(){
+                        	if(alternateImage == false)
+						    	deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={"id":"'+e.rowData.imei+'","object":"device"}');
+						    else
+						    	deviceImage.setImage(deviceImageURL);
+						    alternateImage = !alternateImage;
+						});
                         cameraWin.add(deviceWindow);
                     });
                 }
             }
         }
-    });
-    
-    // If the user holds an item on the deviceList
-    deviceList.addEventListener('longpress', function(e){
-        // Run the deletePlatform function
-        alert("longpress"+e);
     });
 }
 

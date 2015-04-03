@@ -3,6 +3,6 @@
 #url:http://www.appcelerator.com
 #image:appicon.png
 #appid:com.appcelerator.devicetracker
-#desc:This project was created with the idea that we could keep track of all Appcelerator test devices.\r\nEach device has it's own unique barcode and each user/developer has their own unique barcode.\r\n\r\nThe barcodes supported by the scanner are: EAN, UPC and QR codes
+#desc:Undefined
 #type:mobile
 #guid:ff84cb6d-5f3a-4b28-8c17-f7377ae1b618

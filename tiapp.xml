@@ -7,10 +7,7 @@
     <version>1.0</version>
     <publisher>Samuel Dowse</publisher>
     <url>http://www.appcelerator.com</url>
-    <description>This project was created with the idea that we could keep track of all Appcelerator test devices.&#xd;
-Each device has it's own unique barcode and each user/developer has their own unique barcode.&#xd;
-&#xd;
-The barcodes supported by the scanner are: EAN, UPC and QR codes</description>
+    <description>Undefined</description>
     <copyright>2015 by Samuel Dowse</copyright>
     <icon>appicon.png</icon>
     <fullscreen>false</fullscreen>
@@ -77,5 +74,5 @@ The barcodes supported by the scanner are: EAN, UPC and QR codes</description>
         <target device="blackberry">false</target>
         <target device="mobileweb">true</target>
     </deployment-targets>
-    <sdk-version>3.5.0.GA</sdk-version>
+    <sdk-version>3.5.1.GA</sdk-version>
 </ti:app>

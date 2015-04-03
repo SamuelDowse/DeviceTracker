@@ -63,8 +63,9 @@ function openScanner(){
     picker.showSearchBar(true);
     
     picker.setSuccessCallback(function(e) {
-        scannedDevices.push(e.barcode); scanned = true; Ti.Media.vibrate();
+        ((JSON.parse(e.barcode).object == 'device') ? scannedDevices.push(JSON.parse(e.barcode).id) : scannedUsers.push(JSON.parse(e.barcode).id));
         ((Ti.Platform.osname == 'android') ? cameraWin.activity.invalidateOptionsMenu() : cameraWin.setRightNavButton(clear));
+        scanned = true; Ti.Media.vibrate();
     });
     picker.setCancelCallback(function(e) { closeScanner(); });
     
