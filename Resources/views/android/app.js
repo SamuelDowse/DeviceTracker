@@ -28,7 +28,7 @@ function beginAndroid(){
         });
         var clearScanned = menu.add({title: "Clear Scanned", itemId: CLEAR});
         clearScanned.addEventListener("click", function(e) {
-            scannedDevices = []; uniqueDevices = []; scanned = false;
+            scannedDevices = []; scannedUsers = []; uniqueDevices = []; scanned = false;
             cameraWin.activity.invalidateOptionsMenu();
         });
     };
@@ -42,7 +42,7 @@ function beginAndroid(){
     };
     
     // If the user clicks the takePhoto button
-    takePhoto.addEventListener('click', function (evt){
+    takePhoto.addEventListener('singletap', function (evt){
         scannerFile.closeScanner();
         // Run the addPicture function
         deviceFunctions.addPicture(evt);
@@ -57,7 +57,7 @@ function beginAndroid(){
     
     // If the user clicks the save button
     save.addEventListener('singletap', function() {
-        // Run hte saveDevice function
+        // Run the saveDevice function
         deviceFunctions.saveDevice();
     });
     

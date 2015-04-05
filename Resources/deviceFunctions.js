@@ -1,11 +1,11 @@
 function addPicture(evt){
-	if (Ti.Platform.osname != 'mobileweb'){
+    if (Ti.Platform.osname != 'mobileweb'){
         Ti.Media.showCamera({
             success:function(e){photo = e.media;},
             cancel:function(){},
             error:function(error){
                 var a = Ti.UI.createAlertDialog({title:'Error Occurred'});
-                ((error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: ' + error.code));
+                ((error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: '+error.code));
                 a.show();
             }
         });
@@ -15,13 +15,12 @@ function addPicture(evt){
 function call(method, url, data, callback){
     var xhr = new XMLHttpRequest(),
     queryString = '&';
-    
     xhr.onreadystatechange = function(){
         if(xhr.readyState == 4){
             try {
                 var data = JSON.parse(xhr.responseText);
             } catch(error) {
-                var err = new Error((xhr.responseText ? 'Invalid' : 'Empty') + ' response from server.');
+                var err = new Error((xhr.responseText?'Invalid':'Empty')+' response from server.');
                 err.originalMessage = error.message;
                 err.responseText = xhr.responseText;
                 err.status = xhr.status;
@@ -32,7 +31,6 @@ function call(method, url, data, callback){
             callback(null, data);
         }
     };
-    
     if(method == 'GET' || method == 'DELETE'){
         for(var field in data){
             queryString += encodeURIComponent(field) + '=';
@@ -40,51 +38,37 @@ function call(method, url, data, callback){
             queryString += encodeURIComponent(value) + '&';
         }
         data = null;
-    } else {
-        data = JSON.stringify(data);
-    }
-    xhr.open(method, "https://api.cloud.appcelerator.com/v1/"+url+".json?key=TIRHj6F5MQOuR1BYba7GdnJOAOq6IaP3"+queryString);
+    } else { data = JSON.stringify(data); }
+    xhr.open(method, 'https://api.cloud.appcelerator.com/v1/'+url+'.json?key=TIRHj6F5MQOuR1BYba7GdnJOAOq6IaP3'+queryString);
     xhr.setRequestHeader('Content-type', 'application/json');
     xhr.send(data);
 }
 
-function checkoutDevice(){
-	if (Ti.Platform.osname != 'mobileweb'){
+function checkoutDeviceLoggedIn(){
+    if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
             for (var a = 0; a < uniqueDevices.length; a++){
                 for (b = 0; b < devices.length; b++){
                     if (devices[b].imei == uniqueDevices[a]){
                         currentDevice = devices[b];
+                        var message = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name;
+                        var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+currentUser.first_name+' '+currentUser.last_name;
                         switch (currentDevice.taken_by){
                             case currentUser.id:
-                                Cloud.Objects.update({
-                                    classname: 'Device',
-                                    id: currentDevice.id,
-                                    fields: { taken_by: null }
-                                }, function (e) {
+                                Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:null}}, function (e){
                                     if (e.success) {
-                                        var unlinkDialog = Ti.UI.createAlertDialog({
-                                            message: 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name
-                                        });
-                                        unlinkDialog.show();
+                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unl'+message}); unlinkDialog.show();
                                     } else {
-                                        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+                                        Ti.API.error('Failed to unlink '+errorMessage);
                                     }
                                 });
                                 break;
                             default:
-                                Cloud.Objects.update({
-                                    classname: 'Device',
-                                    id: currentDevice.id,
-                                    fields: { taken_by: currentUser.id }
-                                }, function (e) {
+                                Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:currentUser.id}}, function (e){
                                     if (e.success) {
-                                        var linkDialog = Ti.UI.createAlertDialog({
-                                            message: 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+currentUser.first_name+' '+currentUser.last_name
-                                        });
-                                        linkDialog.show();
+                                        var linkDialog = Ti.UI.createAlertDialog({message: 'L'+message}); linkDialog.show();
                                     } else {
-                                        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+                                        Ti.API.error('Failed to link '+errorMessage);
                                     }
                                 });
                                 break;
@@ -97,22 +81,81 @@ function checkoutDevice(){
     }
 }
 
+function checkoutDeviceNotLoggedIn() {
+    if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
+        Cloud.Users.login({login:'assigner', password:'tester'}, function(a){
+            if (a.success){
+                if (scannedUsers.length != 0){
+                    Cloud.Users.query({where:{id:scannedUsers[0]}}, function(b){
+                        if (b.success){
+                            var foundUser = b.users[0];
+                            for (var a = 0; a < uniqueDevices.length; a++){
+                                for (b = 0; b < devices.length; b++){
+                                    if (devices[b].imei == uniqueDevices[a]){
+                                        currentDevice = devices[b];
+                                        var message = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+foundUser.first_name+' '+foundUser.last_name;
+                                        var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+foundUser.first_name+' '+foundUser.last_name;
+                                        switch (currentDevice.taken_by){
+                                            case foundUser.id:
+                                                Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:null}}, function (e){
+                                                    if (e.success) {
+                                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unl'+message}); unlinkDialog.show();
+                                                    } else {
+                                                        Ti.API.error('Failed to unlink '+errorMessage);
+                                                    }
+                                                    logOutAssigner();
+                                                });
+                                                break;
+                                            default:
+                                                Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:foundUser.id}}, function (e){
+                                                    if (e.success) {
+                                                        var linkDialog = Ti.UI.createAlertDialog({message: 'L'+message}); linkDialog.show();
+                                                    } else {
+                                                        Ti.API.error('Failed to link '+errorMessage);
+                                                    }
+                                                    logOutAssigner();
+                                                });
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    for (var a = 0; a < uniqueDevices.length; a++){
+                        for (b = 0; b < devices.length; b++){
+                            if (devices[b].imei == uniqueDevices[a]){
+                                currentDevice = devices[b];
+                                Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:null}}, function (e){
+                                    if (e.success) {
+                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Removing users from device'}); unlinkDialog.show();
+                                    } else {
+                                        Ti.API.error('Failed to unlink '+currentDevice.model+' ('+currentDevice.platform+') from all users');
+                                    }
+                                    logOutAssigner();
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        uniqueDevices = []; getPlatforms(); getDevices();
+    }
+}
+
 function deleteDevice(){
-	if (Ti.Platform.osname != 'mobileweb'){
+    if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-            Cloud.Objects.remove({
-                classname:'Device',
-                id:deviceIDValue
-            }, function (e) {
+            Cloud.Objects.remove({classname:'Device', id:deviceIDValue}, function (e){
                 if (e.success) {
                     cameraWin.remove(editWindow);
                     cameraWin.remove(deviceWindow);
-                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-                        cameraWin.setLeftNavButton(backToPlatforms);
-                        cameraWin.setRightNavButton(blank);
-                    }
+                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){ cameraWin.setLeftNavButton(backToPlatforms); cameraWin.setRightNavButton(blank); }
+                    getPlatforms();
                 } else {
-                    alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+                    Ti.API.error('Failed to remove device');
                 }
             });
         }
@@ -120,25 +163,17 @@ function deleteDevice(){
 }
 
 function deletePlatform(e){
-	if (Ti.Platform.osname != 'mobileweb'){
+    if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
             if (e.rowData != null){
                 var platformToRemove = e.rowData.id;
                 if (e.rowData.platform == true){
                     if(admin == true){
-                        var dialog = Ti.UI.createAlertDialog({
-                            cancel:1,
-                            buttonNames:['Confirm', 'Cancel'],
-                            message:'Are you sure you want to delete this platform?',
-                            title:'Delete'
-                        });
-                        dialog.addEventListener('click', function(e){
+                        var dialog = Ti.UI.createAlertDialog({cancel:1, buttonNames:['Confirm', 'Cancel'], message:'Are you sure you want to delete this platform?', title:'Delete'});
+                        dialog.addEventListener('singletap', function(e){
                             if (e.index != e.source.cancel){
-                                Cloud.Objects.remove({
-                                    classname:'Platforms',
-                                    id:platformToRemove
-                                }, function (e) {
-                                    ((e.success) ? platformToRemove = "" : alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e))));
+                                Cloud.Objects.remove({ classname:'Platforms', id:platformToRemove }, function (e){
+                                    (e.success?platformToRemove='':alert('Error:\n'+((e.error && e.message)||JSON.stringify(e))));
                                 });
                             }
                         });
@@ -151,19 +186,21 @@ function deletePlatform(e){
 }
 
 function getPlatforms() {
-	if (Ti.Platform.osname != 'mobileweb'){
+    if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
             platforms = [];
             uniquePlatforms = [];
-            Cloud.Objects.query({
-                classname:'Platforms',
-                order:'platform',
-                limit:1000
-            }, function (e) {
+            Cloud.Objects.query({classname:'Platforms', order:'platform', limit:50}, function (e){
                 for (var i = 0; i < e.Platforms.length; i++) {
                     var devPlat = e.Platforms[i];
                     if (e.success){
-                        platforms.push({title:devPlat.platform, name:devPlat.platform, color:'white', platform:true, id:devPlat.id});
+                    	platforms.push({
+                    		title:devPlat.platform,
+                    		name:devPlat.platform,
+                    		color:'white',
+                    		platform:true,
+                    		id:devPlat.id
+                    	});
                     }
                 }
                 uniquePlatforms = platforms.filter(function(elem, pos) { return platforms.indexOf(elem) == pos; });
@@ -174,14 +211,10 @@ function getPlatforms() {
 }
 
 function getDevices() {
-	if (Ti.Platform.osname != 'mobileweb'){
+    if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
             devices = [];
-            Cloud.Objects.query({
-                classname:'Device',
-                order:'-osver, model',
-                limit:1000
-            }, function (e) {
+            Cloud.Objects.query({ classname:'Device', order:'-osver, model', limit:1000 }, function (e) {
                 for (var i = 0; i < e.Device.length; i++) {
                     var device = e.Device[i];
                     if (e.success){
@@ -192,9 +225,10 @@ function getDevices() {
                             imei:device.imei,
                             platform:device.platform,
                             osver:device.osver,
-                            takenBy:device.taken_by,
+                            taken_by:device.taken_by,
                             image:device.photo,
                             id:device.id,
+                            tags:device.tags,
                             color:'white'
                         });
                     }
@@ -204,117 +238,42 @@ function getDevices() {
     }
 }
 
-function logCheckDevice() {
-    if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-        Cloud.Users.login({login:'assigner', password:'tester'}, function (e) {
-            if (e.success) {
-            	alert('Logged in as assigner');
-                loggedIn = true;
-                Cloud.Users.query({
-                    where:{id: scannedUsers[0]}
-                }, function (e) {
-                    if (e.success) {
-                    	alert('Found a user with matching ID');
-                        var user = e.users[0];
-                        for (var a = 0; a < uniqueDevices.length; a++){
-                            for (b = 0; b < devices.length; b++){
-                                if (devices[b].imei == uniqueDevices[a]){
-                                    currentDevice = devices[b];
-                                    switch (device.taken_by){
-                                        case user.id:
-                                            Cloud.Objects.update({
-                                                classname: 'Device',
-                                                id: device.id,
-                                                fields: {taken_by:null}
-                                            }, function (e) {
-                                                if (e.success) {
-                                                    var unlinkDialog = Ti.UI.createAlertDialog({
-                                                        message: 'Unlinking Device:\n'+device.model+' ('+device.platform+')\nfrom:\n'+user.first_name+' '+user.last_name
-                                                    });
-                                                    unlinkDialog.show();
-                                                } else {
-                                                    alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-                                                }
-                                            });
-                                            break;
-                                        default:
-                                            Cloud.Objects.update({
-                                                classname: 'Device',
-                                                id: device.id,
-                                                fields: { taken_by:uniqueDevices[0]}
-                                            }, function (e) {
-                                                if (e.success) {
-                                                    var linkDialog = Ti.UI.createAlertDialog({
-                                                        message: 'Linking Device:\n'+device.model+' ('+device.platform+')\nto:\n'+user.first_name+' '+user.last_name
-                                                    });
-                                                    linkDialog.show();
-                                                } else {
-                                                    alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-                                                }
-                                            });
-                                            break;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        for (var a = 0; a < uniqueDevices.length; a++){
-                            for (b = 0; b < devices.length; b++){
-                                if (devices[b].imei == uniqueDevices[a]){
-                                    currentDevice = devices[b];
-                                    Cloud.Objects.update({
-                                        classname: 'Device',
-                                        id: device.id,
-                                        fields: {taken_by:null}
-                                    }, function (e) {
-                                        if (e.success) {
-                                            var unlinkDialog = Ti.UI.createAlertDialog({
-                                                message: 'Unlinking Device From User'
-                                            });
-                                            unlinkDialog.show();
-                                        } else {
-                                            alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    Cloud.Users.logout(function (e) {
-                        loggedIn = false;
-                        alert("Logging out of assigner");
-                    });
-                });
-            } else {
-                alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-            }
-        });
-        uniqueDevices = []; getPlatforms(); getDevices();
-    }
+function logOutAssigner(){
+    Cloud.Users.logout(function (e){
+        if (e.success) {
+            foundUser = null; currentDevice = null; scannedDevices = []; scannedUsers = [];
+        } else {
+            Ti.API.error('Failed to log out of the assigner account');
+        }
+    });
 }
 
 function saveDevice(){
     if (Ti.Platform.osname != 'mobileweb'){
+    	var modelString = deviceModeValue.value;
+        var modelName = modelString.replace(/ \[[^\]]*?\]/g, "");
+        var modelNickname = modelString.replace(/^[^\[]*/g, "");
         Cloud.Objects.update({
-            classname:'Device',
-            id:deviceIDValue,
-            photo:photo,
-            fields:{
-                platform:devicePlatformValue.value,
-                osver:deviceOSValue.value,
-                model:deviceModelValue.value,
-                name:deviceNameValue.value,
-                imei:deviceIMEIValue.value
-            }
+        	classname:'Device',
+        	id:deviceIDValue,
+        	photo:photo,
+        	fields:{
+        		platform:devicePlatformValue.value,
+        		osver:deviceOSValue.value,
+        		model:modelString,
+        		name:deviceNameValue.value,
+        		imei:deviceIMEIValue.value,
+        		tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
+        	}
         }, function (e) {
             if (e.success){
                 cameraWin.remove(editWindow);
-                if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+                if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
                     cameraWin.setLeftNavButton(backToDevices);
                     ((admin == true) ? cameraWin.setRightNavButton(edit) : cameraWin.setRightNavButton(blank));
                 }
             } else {
-                alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+                Ti.API.error('Failed to save device');
             }
         });
         photo = null;
@@ -326,29 +285,19 @@ function selectDevice(e){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
             if (e.rowData != null){
                 if (e.rowData.platform == true){
-                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-                        cameraWin.setLeftNavButton(backToPlatforms);
-                        cameraWin.setRightNavButton(blank);
-                    }
+                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){ cameraWin.setLeftNavButton(backToPlatforms); cameraWin.setRightNavButton(blank); }
                     var selectedPlatform = [];
                     for (var a = 0; a < devices.length; a++){
-                        if (devices[a].platform == e.rowData.name){
-                            selectedPlatform.push(devices[a]);
-                        }
+                        if (devices[a].platform == e.rowData.name){ selectedPlatform.push(devices[a]); }
                     }
                     deviceList.setData(selectedPlatform);
                 } else {
-                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
-                        cameraWin.setLeftNavButton(backToDevices);
-                        ((admin == true) ? cameraWin.setRightNavButton(edit) : cameraWin.setRightNavButton(blank));
-                    }
-                    if (e.rowData.takenBy != undefined){
-                        Cloud.Users.query({
-                            where:{ id:e.rowData.takenBy }
-                        }, function (a) {
+                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){ cameraWin.setLeftNavButton(backToDevices); ((admin == true) ? cameraWin.setRightNavButton(edit) : cameraWin.setRightNavButton(blank)); }
+                    if (e.rowData.taken_by != undefined){
+                        Cloud.Users.query({where:{id:e.rowData.taken_by}}, function (a){
                             var takenBy = a.users[0];
                             if (a.success){
-                                var takenByID = e.rowData.takenBy;
+                                var takenByID = e.rowData.taken_by;
                                 deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nTaken By: '+takenBy.first_name+' '+takenBy.last_name);
                             }
                         });
@@ -356,12 +305,23 @@ function selectDevice(e){
                         var takenByID = null;
                         deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nNot In Use');
                     }
-                    Cloud.Users.query({
-                        where:{ id:takenByID }
-                    }, function (a) {
+                    Cloud.Users.query({where:{id:takenByID}}, function (a){
                         if (a.success){
                             devicePage = true;
-                            var deviceImageURL = ((e.rowData.image != null) ? (Ti.Platform.osname == 'ipad' ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
+                            if (e.rowData.image == null)
+                                deviceImageURL = 'assets/nodevice.png';
+                            else {
+                                if (Ti.Platform.displayCaps.platformWidth > 0 && Ti.Platform.displayCaps.platformWidth < 240)
+                                    deviceImageURL = e.rowData.image.urls['thumb_100'];
+                                else if (Ti.Platform.displayCaps.platformWidth > 241 && Ti.Platform.displayCaps.platformWidth < 500)
+                                    deviceImageURL = e.rowData.image.urls['small_240'];
+                                else if (Ti.Platform.displayCaps.platformWidth > 501 && Ti.Platform.displayCaps.platformWidth < 640)
+                                    deviceImageURL = e.rowData.image.urls['medium_500'];
+                                else if (Ti.Platform.displayCaps.platformWidth > 641 && Ti.Platform.displayCaps.platformWidth < 1024)
+                                    deviceImageURL = e.rowData.image.urls['medium_640'];
+                                else if (Ti.Platform.displayCaps.platformWidth > 1025)
+                                    deviceImageURL = e.rowData.image.urls['large_1024'];
+                            }
                             deviceImage.setImage(deviceImageURL);
                             devicePlatformValue.setValue(e.rowData.platform);
                             deviceOSValue.setValue(e.rowData.osver);
@@ -371,8 +331,7 @@ function selectDevice(e){
                             deviceIDValue = e.rowData.id;
                             cameraWin.add(deviceWindow);
                             cameraWin.remove(deviceWin);
-                            if (Ti.Platform.osname == 'android')
-                                cameraWin.activity.invalidateOptionsMenu();
+                            if (Ti.Platform.osname == 'android') cameraWin.activity.invalidateOptionsMenu();
                         }
                     });
                 }
@@ -384,6 +343,9 @@ function selectDevice(e){
 function uploadDevice(){
     if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
+        	var modelString = deviceModelValue.value;
+            var modelName = modelString.replace(/ \[[^\]]*?\]/g, "");
+            var modelNickname = modelString.replace(/^[^\[]*/g, "");
             Cloud.Objects.create({
                 classname:'Device',
                 acl_name:'AllAccess',
@@ -391,48 +353,47 @@ function uploadDevice(){
                 fields:{
                     name:deviceNameValue.value,
                     platform:devicePlatformValue.value,
-                    model:deviceModelValue.value,
-                    osver:deviceOSValue.value,
-                    imei:deviceIMEIValue.value
-               }
-            }, function (e) {
+                    model:modelString,
+            		osver:deviceOSValue.value,
+            		imei:deviceIMEIValue.value,
+            		tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
+            	}
+            }, function (e){
                 if (e.success){
                     cameraWin.remove(addWindow);
-                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == "ipad"){
+                    if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
                         cameraWin.setLeftNavButton(blank);
-                        if(admin == true)
-                            cameraWin.setRightNavButton(add);
-                        else
-                            cameraWin.setRightNavButton(blank);
+                        admin?cameraWin.setRightNavButton(add):cameraWin.setRightNavButton(blank);
                     }
                 } else {
-                    alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+                    Ti.API.error('Failed to upload device');
                 }
             });
             photo = null;
-            if ( currentPlatforms.indexOf(devicePlatformValue.value) > -1 ){
-                Ti.API.info("OS already exists, ignoring creation of OS in ACS");
-            } else {
-                Cloud.Objects.create({
-                    classname:'Platforms',acl_name:'AllAccess',fields:{platform:devicePlatformValue.value}
-                }, function (e) {
-                    if (!e.success)
-                        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-                });
-            }
+            foundPlatforms = [];
+            Cloud.Objects.query({classname:'Platforms', order:'platform', limit:50}, function (e){
+                for (var i = 0; i < e.Platforms.length; i++) {
+                    if (e.success) foundPlatforms.push(e.Platforms[i].platform);
+                }
+                if(devicePlatformValue.value in foundPlatforms == false){
+                    Cloud.Objects.create({classname:'Platforms',acl_name:'AllAccess',fields:{platform:devicePlatformValue.value}}, function (e){
+                        if (!e.success) Ti.API.error('Failed to create new platform');
+                    });
+                }
+           });
         }
     }
 }
 
 // Export the following functions so they can be used outside of this file
-exports.addPicture     = addPicture;
-exports.call           = call;
-exports.checkoutDevice = checkoutDevice;
-exports.deleteDevice   = deleteDevice;
-exports.deletePlatform = deletePlatform;
-exports.getPlatforms   = getPlatforms;
-exports.getDevices     = getDevices;
-exports.logCheckDevice = logCheckDevice;
-exports.saveDevice     = saveDevice;
-exports.selectDevice   = selectDevice;
-exports.uploadDevice   = uploadDevice;
+exports.addPicture                = addPicture;
+exports.call                      = call;
+exports.checkoutDeviceLoggedIn    = checkoutDeviceLoggedIn;
+exports.deleteDevice              = deleteDevice;
+exports.deletePlatform            = deletePlatform;
+exports.getPlatforms              = getPlatforms;
+exports.getDevices                = getDevices;
+exports.checkoutDeviceNotLoggedIn = checkoutDeviceNotLoggedIn;
+exports.saveDevice                = saveDevice;
+exports.selectDevice              = selectDevice;
+exports.uploadDevice              = uploadDevice;

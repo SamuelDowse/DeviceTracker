@@ -1,19 +1,16 @@
 // Set the background color of the application
 Ti.UI.setBackgroundColor('#484850');
 // GLOBAL VARIABLES \\
-if (Ti.Platform.osname == 'android'){
-    var androidSetUp    = require('views/android/app');
-}
 if (Ti.Platform.osname != 'mobileweb'){
     var Cloud           = require('ti.cloud');
     var scanditsdk      = require('com.mirasense.scanditsdk');
 }
-if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
+if (Ti.Platform.osname == 'android')
+    var androidSetUp    = require('views/android/app');
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')
     var iOSSetUp        = require('views/ios/app');
-}
-if (Ti.Platform.osname == 'mobileweb'){
+if (Ti.Platform.osname == 'mobileweb')
     var mobileWebSetUp  = require('views/mobileweb/app');
-}
 var scannerFile         = require('scannerFile');
 var userLog             = require('userLog');
 var deviceFunctions     = require('deviceFunctions');
@@ -34,6 +31,7 @@ if (Ti.Platform.osname != 'mobileweb')
     var search          = Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0});
 
 var deviceList          = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
+var deviceListTwo       = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
 
 var deviceIMEIValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI', color:'white'});
 var deviceModelValue    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Model', color:'white'});
@@ -71,19 +69,21 @@ var cameraIndexField;
 var currentUser;
 var deviceIDValue;
 var platformToRemove;
+var searchValue;
 // GLOBAL VARIABLES \\
 
 // OS SPECIFIC VARIABLES \\
 var add                 = Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'});
 var backToDevice        = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevices       = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
-var backToHome          = Ti.UI.createButton({title:'Back', bottom: '2%'});
+var backToHome          = Ti.UI.createButton({title:'Back', top: '2%', left:'5%'});
 var backToPlatforms     = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var blank               = Ti.UI.createButton({color:'white', backgroundImage:'none'});
 var clear               = Ti.UI.createButton({title:'Clear', color:'white', backgroundImage:'none'});
 var closeAddWindow      = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var deleteDevice        = Ti.UI.createButton({title:'Delete', color:'red', backgroundImage:'none'});
 var edit                = Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'});
+var editMobileWeb       = Ti.UI.createButton({title:'Edit', top:'2%', right:'5%'});
 var save                = Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'});
 var toDevices           = Ti.UI.createButton({title:'Devices', color:'white', backgroundImage:'none'});
 var upload              = Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'});
@@ -92,6 +92,8 @@ var addPage             = false;
 var devicePage          = false;
 var editPage            = false;
 var listPage            = false;
+var loginPage           = false;
+
 // OS SPECIFIC VARIABLES \\
 
 // Check for a network connection

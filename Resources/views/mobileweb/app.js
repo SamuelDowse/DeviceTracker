@@ -1,21 +1,6 @@
-/**
- * Set up the UI for a mobileweb device.
- * Everything visual outside of the scanning screen is set up in here.
- */
-function beginMobileWeb(){
-	var alternateImage = false;
-    // Add the deviceImage to the deviceWindow
-    deviceWindow.add(deviceImage);
-    // Add the deviceInfo to the deviceWindow
-    deviceWindow.add(deviceInfo);
-    backToHome.addEventListener('click', function(e){
-        deviceList.setData(uniquePlatforms);
-        cameraWin.remove(deviceWindow);
-    });
-    deviceWindow.add(backToHome);
-    
+function obtainAll(){
     if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-        deviceFunctions.call("GET", "objects/Platforms/query", null, function(err, data){
+        deviceFunctions.call('GET', 'objects/Platforms/query', {'order':'-platform'}, function(err, data){
             var numberOfPlatforms = data.response.Platforms;
             var platformCount = 0;
             for (currentPlatforms in numberOfPlatforms){
@@ -23,14 +8,19 @@ function beginMobileWeb(){
                     platformCount++;
             }
             for (i = 0; i < platformCount; i++){
-                platforms.push({title:numberOfPlatforms[i].platform, name:numberOfPlatforms[i].platform, color:'white', platform:true, id:numberOfPlatforms[i].id});
+                platforms.push({
+                    title:numberOfPlatforms[i].platform,
+                    name:numberOfPlatforms[i].platform,
+                    color:'white',
+                    platform:true,
+                    id:numberOfPlatforms[i].id
+                });
             }
             uniquePlatforms = platforms.filter(function(elem, pos) { return platforms.indexOf(elem) == pos; });
             deviceList.setData(uniquePlatforms.reverse());
-            cameraWin.add(deviceList);
         });
         
-        deviceFunctions.call("GET", "objects/Device/query", {"limit":1000}, function(err, data){
+        deviceFunctions.call('GET', 'objects/Device/query', {'limit':1000, 'order':'-osver, model'}, function(err, data){
             var numberOfDevices = data.response.Device;
             var deviceCount = 0;
             for (currentDevices in numberOfDevices){
@@ -38,11 +28,84 @@ function beginMobileWeb(){
                     deviceCount++;
             }
             for (i = 0; i < deviceCount; i++){
-                devices.push({title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')', model:numberOfDevices[i].model, name:numberOfDevices[i].name, imei:numberOfDevices[i].imei, platform:numberOfDevices[i].platform, osver:numberOfDevices[i].osver, takenBy:numberOfDevices[i].taken_by, image:numberOfDevices[i].photo, id:numberOfDevices[i].id, color:'white'});
+                devices.push({
+                    title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')',
+                    model:numberOfDevices[i].model,
+                    name:numberOfDevices[i].name,
+                    imei:numberOfDevices[i].imei,
+                    platform:numberOfDevices[i].platform,
+                    osver:numberOfDevices[i].osver,
+                    takenBy:numberOfDevices[i].taken_by,
+                    image:numberOfDevices[i].photo,
+                    id:numberOfDevices[i].id,
+                    tags:numberOfDevices[i].tags,
+                    color:'white'
+                });
             }
         });
     }
+}
+
+function searchDevices(){
+    var foundArray = [];
+    var indexArray = [];
+    var searchArray=searchValue.split(',');
+    for (var a = 0; a < devices.length; a++){
+        deviceTag = devices[a].tags.toString();
+        deviceTag = deviceTag.toLowerCase();
+        if (deviceTag.indexOf(searchArray[0]) > -1)
+            foundArray.push(devices[a]);
+    }
+    for (var b = 1; b < searchArray.length; b++){
+        indexArray = [];
+        for (var c = 0; c < foundArray.length; c++){
+            searchValue = searchArray[b].toLowerCase();
+            deviceTag = foundArray[c].tags.toString();
+            deviceTag = deviceTag.toLowerCase();
+            if (deviceTag.indexOf(searchValue) == -1)
+                indexArray.push(c);
+        }
+        indexArray = indexArray.reverse();
+        for (var d = 0; d < indexArray.length; d++)
+            foundArray.splice(indexArray[d], 1);
+    }
+    deviceListTwo.setData(foundArray);
+}
+
+/**
+ * Set up the UI for a mobileweb device.
+ * Everything visual outside of the scanning screen is set up in here.
+ */
+function beginMobileWeb(){
+    obtainAll();
     
+    var appcLogo      = Ti.UI.createImageView({image:'assets/logo.png', left:10});
+    var seperator     = Ti.UI.createView({backgroundColor:'#242428', width:'3', right:0});
+    var searchBar     = Ti.UI.createTextField({font:{fontSize:18}, hintText:'Search', color:'#93939e', backgroundColor:'white', right:10, width:'20%'});
+    var searchView    = Ti.UI.createView({backgroundColor:'#B50D00', width:'100%', height:'5%', top:0});
+    
+    deviceList.setBackgroundColor('#303035');
+    deviceList.setBottom(0);
+    deviceList.setHeight('95%');
+    deviceList.setLeft(0);
+    deviceList.setWidth('30%');
+    deviceWindow.setBottom(0);
+    deviceWindow.setHeight('95%');
+    
+    appcLogo.addEventListener('click', function(e){ searchBar.setValue(''); deviceListTwo.setData([]); cameraWin.remove(deviceWindow); });
+    searchBar.addEventListener('click', function(e){ searchBar.setColor('black'); });
+    searchBar.addEventListener('blur', function(e){ searchBar.setColor('#93939e'); });
+    searchBar.addEventListener('return', function(e){ searchValue = searchBar.value; searchBar.setValue(''); searchDevices(); cameraWin.remove(deviceWindow); });
+
+    cameraWin.add(deviceList);
+    cameraWin.add(deviceListTwo);
+    cameraWin.add(searchView);
+    deviceList.add(seperator);
+    deviceWindow.add(deviceImage);    
+    deviceWindow.add(deviceInfo);
+    searchView.add(appcLogo);
+    searchView.add(searchBar);
+
     // If the user taps on the deviceList
     deviceList.addEventListener('click', function(e){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
@@ -53,38 +116,59 @@ function beginMobileWeb(){
                         if (devices[a].platform == e.rowData.name)
                             selectedPlatform.push(devices[a]);
                     }
-                    deviceList.setData(selectedPlatform);
-                } else {
-                    if (e.rowData.takenBy != undefined){
-                        deviceFunctions.call("GET", "users/query", {where:{ id:e.rowData.takenBy }}, function(err, data){
-                            var test = data.response;
-                            var takenByID = e.rowData.takenBy;
-                            deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nTaken By: '+test.users[0].first_name+' '+test.users[0].last_name);
-                        });
-                    } else {
-                        var takenByID = null;
-                        deviceInfo.setText(e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei+'\nNot In Use');
-                    }
-                    deviceFunctions.call("GET", "users/query", {where:{ id:takenByID }}, function(err, data){
-                        var test = data.response;
-                        var deviceImageURL = ((e.rowData.image != null) ? ((Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'mobileweb') ? e.rowData.image.urls['original'] : e.rowData.image.urls['small_240']) : "assets/nodevice.png");
-                        deviceImage.setImage(deviceImageURL);
-                        devicePlatformValue.setValue(e.rowData.platform);
-                        deviceOSValue.setValue(e.rowData.osver);
-                        deviceModelValue.setValue(e.rowData.model);
-                        deviceNameValue.setValue(e.rowData.name);
-                        deviceIMEIValue.setValue(e.rowData.imei);
-                        deviceIDValue = e.rowData.id;
-                        deviceImage.addEventListener('click', function(){
-                        	if(alternateImage == false)
-						    	deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={"id":"'+e.rowData.imei+'","object":"device"}');
-						    else
-						    	deviceImage.setImage(deviceImageURL);
-						    alternateImage = !alternateImage;
-						});
-                        cameraWin.add(deviceWindow);
-                    });
+                    deviceListTwo.setData(selectedPlatform);
                 }
+            }
+        }
+    });
+    
+    deviceListTwo.addEventListener('click', function(e){
+        if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
+            if (e.rowData != null){
+                var message = e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei;
+                if (e.rowData.takenBy != undefined){
+                    deviceFunctions.call('GET', 'users/query', {where:{ id:e.rowData.takenBy }}, function(err, data){
+                        var obtainedData = data.response;
+                        var takenByID = e.rowData.takenBy;
+                        deviceInfo.setText(message+'\nTaken By: '+obtainedData.users[0].first_name+' '+obtainedData.users[0].last_name);
+                    });
+                } else {
+                    var takenByID = null;
+                    deviceInfo.setText(message+'\nNot In Use');
+                }
+                deviceFunctions.call('GET', 'users/query', {where:{ id:takenByID }}, function(err, data){
+                    var test = data.response;
+                    if (e.rowData.image == null)
+                        deviceImageURL = 'assets/nodevice.png';
+                    else {
+                        if (Ti.Platform.displayCaps.platformWidth > 0 && Ti.Platform.displayCaps.platformWidth < 240)
+                            deviceImageURL = e.rowData.image.urls['thumb_100'];
+                        else if (Ti.Platform.displayCaps.platformWidth > 241 && Ti.Platform.displayCaps.platformWidth < 500)
+                            deviceImageURL = e.rowData.image.urls['small_240'];
+                        else if (Ti.Platform.displayCaps.platformWidth > 501 && Ti.Platform.displayCaps.platformWidth < 640)
+                            deviceImageURL = e.rowData.image.urls['medium_500'];
+                        else if (Ti.Platform.displayCaps.platformWidth > 641 && Ti.Platform.displayCaps.platformWidth < 1024)
+                            deviceImageURL = e.rowData.image.urls['medium_640'];
+                        else if (Ti.Platform.displayCaps.platformWidth > 1025)
+                            deviceImageURL = e.rowData.image.urls['large_1024'];
+                    }
+                    deviceImage.setImage(deviceImageURL);
+                    devicePlatformValue.setValue(e.rowData.platform);
+                    deviceOSValue.setValue(e.rowData.osver);
+                    deviceModelValue.setValue(e.rowData.model);
+                    deviceNameValue.setValue(e.rowData.name);
+                    deviceIMEIValue.setValue(e.rowData.imei);
+                    deviceIDValue = e.rowData.id;
+                    var alternateImage = false;
+                    deviceImage.addEventListener('dblclick', function(){
+                        if(alternateImage == false)
+                            deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.imei+'","object":"device"}');
+                        else
+                            deviceImage.setImage(deviceImageURL);
+                        alternateImage = !alternateImage;
+                    });
+                    cameraWin.add(deviceWindow);
+                });
             }
         }
     });

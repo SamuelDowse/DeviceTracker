@@ -6,6 +6,8 @@
 function logIn(){
     // Check the internet connection
     if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
+        // Set the loginPage variable to true
+        loginPage = true;
         // If the log in button is clicked
         loginButton.addEventListener("click", function() {
             // Run the ACS log in method
