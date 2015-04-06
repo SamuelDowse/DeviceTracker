@@ -38,6 +38,7 @@ var deviceModelValue    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hin
 var deviceNameValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Name', color:'white'});
 var deviceOSValue       = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'OS Version', color:'white'});
 var devicePlatformValue = Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform', color:'white'});
+var searchBar           = Ti.UI.createTextField({font:{fontSize:18}, hintText:'Search', color:'#93939e', backgroundColor:'white', right:10, width:'20%'});
 var userName            = Ti.UI.createTextField({top:50, autocorrect:false, hintText:'Username', color:'white'});
 var userPassword        = Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password', color:'white'});
 

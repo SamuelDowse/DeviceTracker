@@ -1,5 +1,6 @@
 function obtainAll(){
     if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
+    	platforms = []; uniquePlatforms = []; devices = [];
         deviceFunctions.call('GET', 'objects/Platforms/query', {'order':'-platform'}, function(err, data){
             var numberOfPlatforms = data.response.Platforms;
             var platformCount = 0;
@@ -49,6 +50,7 @@ function obtainAll(){
 function searchDevices(){
     var foundArray = [];
     var indexArray = [];
+    searchValue = searchValue.replace(/\s*,\s*/g, ',');
     var searchArray=searchValue.split(',');
     for (var a = 0; a < devices.length; a++){
         deviceTag = devices[a].tags.toString();
@@ -69,6 +71,7 @@ function searchDevices(){
         for (var d = 0; d < indexArray.length; d++)
             foundArray.splice(indexArray[d], 1);
     }
+    searchBar.setValue("Results found: "+foundArray.length);
     deviceListTwo.setData(foundArray);
 }
 
@@ -81,7 +84,6 @@ function beginMobileWeb(){
     
     var appcLogo      = Ti.UI.createImageView({image:'assets/logo.png', left:10});
     var seperator     = Ti.UI.createView({backgroundColor:'#242428', width:'3', right:0});
-    var searchBar     = Ti.UI.createTextField({font:{fontSize:18}, hintText:'Search', color:'#93939e', backgroundColor:'white', right:10, width:'20%'});
     var searchView    = Ti.UI.createView({backgroundColor:'#B50D00', width:'100%', height:'5%', top:0});
     
     deviceList.setBackgroundColor('#303035');
@@ -92,8 +94,8 @@ function beginMobileWeb(){
     deviceWindow.setBottom(0);
     deviceWindow.setHeight('95%');
     
-    appcLogo.addEventListener('click', function(e){ searchBar.setValue(''); deviceListTwo.setData([]); cameraWin.remove(deviceWindow); });
-    searchBar.addEventListener('click', function(e){ searchBar.setColor('black'); });
+    appcLogo.addEventListener('click', function(e){ searchBar.setValue(''); deviceListTwo.setData([]); cameraWin.remove(deviceWindow); obtainAll(); });
+    searchBar.addEventListener('click', function(e){ searchBar.setColor('black'); if (searchBar.value.indexOf('Results found') > -1) searchBar.setValue(''); });
     searchBar.addEventListener('blur', function(e){ searchBar.setColor('#93939e'); });
     searchBar.addEventListener('return', function(e){ searchValue = searchBar.value; searchBar.setValue(''); searchDevices(); cameraWin.remove(deviceWindow); });
 

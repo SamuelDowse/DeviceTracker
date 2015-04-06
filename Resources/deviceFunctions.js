@@ -51,13 +51,14 @@ function checkoutDeviceLoggedIn(){
                 for (b = 0; b < devices.length; b++){
                     if (devices[b].imei == uniqueDevices[a]){
                         currentDevice = devices[b];
-                        var message = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name;
+                        var messageOne = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform;
+                        var messageTwo = currentUser.first_name+' '+currentUser.last_name;
                         var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+currentUser.first_name+' '+currentUser.last_name;
                         switch (currentDevice.taken_by){
                             case currentUser.id:
                                 Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:null}}, function (e){
                                     if (e.success) {
-                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unl'+message}); unlinkDialog.show();
+                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unl'+messageOne+')\nfrom:\n'+messageTwo}); unlinkDialog.show();
                                     } else {
                                         Ti.API.error('Failed to unlink '+errorMessage);
                                     }
@@ -66,7 +67,7 @@ function checkoutDeviceLoggedIn(){
                             default:
                                 Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:currentUser.id}}, function (e){
                                     if (e.success) {
-                                        var linkDialog = Ti.UI.createAlertDialog({message: 'L'+message}); linkDialog.show();
+                                        var linkDialog = Ti.UI.createAlertDialog({message: 'L'+messageOne+')\nto:\n'+messageTwo}); linkDialog.show();
                                     } else {
                                         Ti.API.error('Failed to link '+errorMessage);
                                     }
@@ -93,13 +94,14 @@ function checkoutDeviceNotLoggedIn() {
                                 for (b = 0; b < devices.length; b++){
                                     if (devices[b].imei == uniqueDevices[a]){
                                         currentDevice = devices[b];
-                                        var message = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+foundUser.first_name+' '+foundUser.last_name;
+                                        var messageOne = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform;
+                                        var messageTwo = foundUser.first_name+' '+foundUser.last_name;
                                         var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+foundUser.first_name+' '+foundUser.last_name;
                                         switch (currentDevice.taken_by){
                                             case foundUser.id:
                                                 Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:null}}, function (e){
                                                     if (e.success) {
-                                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unl'+message}); unlinkDialog.show();
+                                                        var unlinkDialog = Ti.UI.createAlertDialog({message: 'Unl'+messageOne+')\nfrom:\n'+messageTwo}); unlinkDialog.show();
                                                     } else {
                                                         Ti.API.error('Failed to unlink '+errorMessage);
                                                     }
@@ -109,7 +111,7 @@ function checkoutDeviceNotLoggedIn() {
                                             default:
                                                 Cloud.Objects.update({classname:'Device', id:currentDevice.id, fields:{taken_by:foundUser.id}}, function (e){
                                                     if (e.success) {
-                                                        var linkDialog = Ti.UI.createAlertDialog({message: 'L'+message}); linkDialog.show();
+                                                        var linkDialog = Ti.UI.createAlertDialog({message: 'L'+messageOne+')\nto:\n'+messageTwo}); linkDialog.show();
                                                     } else {
                                                         Ti.API.error('Failed to link '+errorMessage);
                                                     }
