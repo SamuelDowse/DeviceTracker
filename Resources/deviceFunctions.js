@@ -14,6 +14,7 @@ function addPicture(evt){
 
 function call(method, url, data, callback){
     var xhr = new XMLHttpRequest(),
+    appKey = Ti.App.Properties.getString('acs-api-key-'+Ti.App.deployType);
     queryString = '&';
     xhr.onreadystatechange = function(){
         if(xhr.readyState == 4){
@@ -39,7 +40,7 @@ function call(method, url, data, callback){
         }
         data = null;
     } else { data = JSON.stringify(data); }
-    xhr.open(method, 'https://api.cloud.appcelerator.com/v1/'+url+'.json?key=TIRHj6F5MQOuR1BYba7GdnJOAOq6IaP3'+queryString);
+    xhr.open(method, 'https://api.cloud.appcelerator.com/v1/'+url+'.json?key='+appKey+queryString);
     xhr.setRequestHeader('Content-type', 'application/json');
     xhr.send(data);
 }
@@ -196,13 +197,13 @@ function getPlatforms() {
                 for (var i = 0; i < e.Platforms.length; i++) {
                     var devPlat = e.Platforms[i];
                     if (e.success){
-                    	platforms.push({
-                    		title:devPlat.platform,
-                    		name:devPlat.platform,
-                    		color:'white',
-                    		platform:true,
-                    		id:devPlat.id
-                    	});
+                        platforms.push({
+                            title:devPlat.platform,
+                            name:devPlat.platform,
+                            color:'white',
+                            platform:true,
+                            id:devPlat.id
+                        });
                     }
                 }
                 uniquePlatforms = platforms.filter(function(elem, pos) { return platforms.indexOf(elem) == pos; });
@@ -252,21 +253,21 @@ function logOutAssigner(){
 
 function saveDevice(){
     if (Ti.Platform.osname != 'mobileweb'){
-    	var modelString = deviceModeValue.value;
+        var modelString = deviceModeValue.value;
         var modelName = modelString.replace(/ \[[^\]]*?\]/g, "");
         var modelNickname = modelString.replace(/^[^\[]*/g, "");
         Cloud.Objects.update({
-        	classname:'Device',
-        	id:deviceIDValue,
-        	photo:photo,
-        	fields:{
-        		platform:devicePlatformValue.value,
-        		osver:deviceOSValue.value,
-        		model:modelString,
-        		name:deviceNameValue.value,
-        		imei:deviceIMEIValue.value,
-        		tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
-        	}
+            classname:'Device',
+            id:deviceIDValue,
+            photo:photo,
+            fields:{
+                platform:devicePlatformValue.value,
+                osver:deviceOSValue.value,
+                model:modelString,
+                name:deviceNameValue.value,
+                imei:deviceIMEIValue.value,
+                tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
+            }
         }, function (e) {
             if (e.success){
                 cameraWin.remove(editWindow);
@@ -345,7 +346,7 @@ function selectDevice(e){
 function uploadDevice(){
     if (Ti.Platform.osname != 'mobileweb'){
         if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
-        	var modelString = deviceModelValue.value;
+            var modelString = deviceModelValue.value;
             var modelName = modelString.replace(/ \[[^\]]*?\]/g, "");
             var modelNickname = modelString.replace(/^[^\[]*/g, "");
             Cloud.Objects.create({
@@ -356,10 +357,10 @@ function uploadDevice(){
                     name:deviceNameValue.value,
                     platform:devicePlatformValue.value,
                     model:modelString,
-            		osver:deviceOSValue.value,
-            		imei:deviceIMEIValue.value,
-            		tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
-            	}
+                    osver:deviceOSValue.value,
+                    imei:deviceIMEIValue.value,
+                    tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
+                }
             }, function (e){
                 if (e.success){
                     cameraWin.remove(addWindow);
