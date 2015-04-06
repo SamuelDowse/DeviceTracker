@@ -152,6 +152,7 @@ switch(Ti.Platform.osname){
         break;
 }
 
+// If the user is not using mobileweb, START THE SCANNER!
 if (Ti.Platform.osname != 'mobileweb')
     scannerFile.openScanner();
 

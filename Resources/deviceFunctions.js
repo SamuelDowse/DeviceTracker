@@ -1,9 +1,18 @@
-function addPicture(evt){
+/**
+ * Open the camera to let the user take a picture.
+ */
+function addPicture(){
+	// Check if the user is using mobileweb. If not, carry on.
     if (Ti.Platform.osname != 'mobileweb'){
+    	// Open the camera UI.
         Ti.Media.showCamera({
+        	// If a picture was taken, obtain the photo.
             success:function(e){photo = e.media;},
+            // If the user cancels, do nothing.
             cancel:function(){},
+            // If there was an error!
             error:function(error){
+            	// Alert the user of the error!
                 var a = Ti.UI.createAlertDialog({title:'Error Occurred'});
                 ((error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: '+error.code));
                 a.show();
@@ -373,14 +382,16 @@ function uploadDevice(){
                 }
             });
             photo = null;
-            foundPlatforms = [];
+            var foundPlatform = 0;
             Cloud.Objects.query({classname:'Platforms', order:'platform', limit:50}, function (e){
                 for (var i = 0; i < e.Platforms.length; i++) {
-                    if (e.success) foundPlatforms.push(e.Platforms[i].platform);
+                    if (devicePlatformValue.value == e.Platforms[i].platform)
+                    	foundPlatform++;
                 }
-                if(devicePlatformValue.value in foundPlatforms == false){
+                if(foundPlatform = 0){
                     Cloud.Objects.create({classname:'Platforms',acl_name:'AllAccess',fields:{platform:devicePlatformValue.value}}, function (e){
-                        if (!e.success) Ti.API.error('Failed to create new platform');
+                        if (!e.success)
+                        	Ti.API.error('Failed to create new platform');
                     });
                 }
            });

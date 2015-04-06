@@ -71,6 +71,7 @@ function beginiOS(){
         cameraWin.remove(addWindow);
         // Set the leftNavButton to be blank
         cameraWin.setLeftNavButton(blank);
+        scannerFile.openScanner();
         // If the user is an admin
         if(admin == true)
             // Set the rightNavButton to the add button
@@ -96,6 +97,7 @@ function beginiOS(){
         devicePlatformValue.setValue(null); deviceOSValue.setValue(null);
         deviceModelValue.setValue(null); deviceNameValue.setValue(null);
         deviceIMEIValue.setValue(null); cameraWin.add(addWindow);
+        scannerFile.closeScanner();
         // Set the leftNavButton to the closeAddWindow button
         cameraWin.setLeftNavButton(closeAddWindow);
         // Set the rightNavButton to the upload button
@@ -106,6 +108,7 @@ function beginiOS(){
     upload.addEventListener('singletap', function() {
         // Run the uploadDevice function
         deviceFunctions.uploadDevice();
+        scannerFile.openScanner();
     });
     
     // If the user clicks the deleteDevice button
