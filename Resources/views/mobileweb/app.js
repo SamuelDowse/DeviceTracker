@@ -51,6 +51,7 @@ function searchDevices(){
     var foundArray = [];
     var indexArray = [];
     searchValue = searchValue.replace(/\s*,\s*/g, ',');
+    searchValue = searchValue.toLowerCase();
     var searchArray=searchValue.split(',');
     for (var a = 0; a < devices.length; a++){
         deviceTag = devices[a].tags.toString();
