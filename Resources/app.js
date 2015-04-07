@@ -75,6 +75,7 @@ var searchValue;
 
 // OS SPECIFIC VARIABLES \\
 var add                 = Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'});
+var backToCamera        = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevice        = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevices       = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToHome          = Ti.UI.createButton({title:'Back', top: '2%', left:'5%'});
