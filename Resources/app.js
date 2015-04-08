@@ -54,7 +54,7 @@ var loginWindow         = Ti.UI.createView({backgroundColor:"#484850", layout:"v
 var cameraWin           = Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00'});
 
 if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
-    var tab            = Ti.UI.createTab({window:cameraWin});
+    var tab1            = Ti.UI.createTab({window:cameraWin});
     tabGroup.addTab(tab1);
 }
 
