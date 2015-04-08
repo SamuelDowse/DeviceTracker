@@ -30,6 +30,9 @@ var deviceInfo          = Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI
 if (Ti.Platform.osname != 'mobileweb')
     var search          = Ti.UI.createSearchBar({barColor:'#B50D00', height:43, top:0});
 
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')    
+    var tabGroup        = Ti.UI.createTabGroup();
+
 var deviceList          = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
 var deviceListTwo       = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
 
@@ -50,6 +53,11 @@ var loginWindow         = Ti.UI.createView({backgroundColor:"#484850", layout:"v
 
 var cameraWin           = Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00'});
 
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
+    var tab            = Ti.UI.createTab({window:cameraWin});
+    tabGroup.addTab(tab1);
+}
+
 var admin               = false;
 var loggedIn            = false;
 var scanned             = false;
@@ -64,13 +72,11 @@ var scannedDevices      = [];
 var scannedUsers        = [];
 var uniqueDevices       = [];
 var uniqueUsers         = [];
-var uniquePlatforms     = [];
 
 var cameraIndexField;
 var currentUser;
 var deviceIDValue;
 var platformToRemove;
-var searchValue;
 // GLOBAL VARIABLES \\
 
 // OS SPECIFIC VARIABLES \\
@@ -94,7 +100,11 @@ var addPage             = false;
 var devicePage          = false;
 var editPage            = false;
 var listPage            = false;
+var listPageTwo         = false;
 var loginPage           = false;
+
+var androidCurrentPlatform;
+var searchValue;
 
 // OS SPECIFIC VARIABLES \\
 
@@ -157,5 +167,10 @@ switch(Ti.Platform.osname){
 if (Ti.Platform.osname != 'mobileweb')
     scannerFile.openScanner();
 
-// Open the camera view
-cameraWin.open();
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
+    // Open the camera view
+    tabGroup.open();
+} else {
+    // Open the camera view
+    cameraWin.open();
+}

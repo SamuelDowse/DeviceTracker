@@ -36,6 +36,8 @@ function logIn(){
                     cameraWin.remove(loginWindow);
                     // Start the scanner again
                     picker.startScanning();
+                    // Set the loginPage variable to false
+                    loginPage = false;
                 } else {
                     // Alert the user of incorrect log in details
                     alert('Incorrect Username/Password');
