@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-    <property name="acs-api-key-production" type="string">HLX9K5PrvFDfgWLZLHmyEnDruqbJORBo</property>
+	<property name="acs-api-key-production" type="string">TIRHj6F5MQOuR1BYba7GdnJOAOq6IaP3</property>
+    <property name="acs-api-key-production2" type="string">HLX9K5PrvFDfgWLZLHmyEnDruqbJORBo</property>
     <property name="acs-api-key-development" type="string">TIRHj6F5MQOuR1BYba7GdnJOAOq6IaP3</property>
     <id>com.appcelerator.devicetracker</id>
     <name>DeviceTracker</name>

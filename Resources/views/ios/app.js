@@ -11,7 +11,7 @@ function beginiOS(){
     
     // If the user clicks the save button
     save.addEventListener('singletap', function() {
-        // Run hte saveDevice function
+        // Run hthe saveDevice function
         deviceFunctions.saveDevice();
     });
     
