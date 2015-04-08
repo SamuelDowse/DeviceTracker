@@ -45,17 +45,17 @@ var searchBar           = Ti.UI.createTextField({font:{fontSize:18}, hintText:'S
 var userName            = Ti.UI.createTextField({top:50, autocorrect:false, hintText:'Username', color:'white'});
 var userPassword        = Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password', color:'white'});
 
-var addWindow           = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical'});
-var deviceWin           = Ti.UI.createView({title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00'});
-var deviceWindow        = Ti.UI.createView({backgroundColor:'#484850'});
-var editWindow          = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical'});
-var loginWindow         = Ti.UI.createView({backgroundColor:"#484850", layout:"vertical"});
+var addWindow           = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
+var deviceWin           = Ti.UI.createView({title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
+var deviceWindow        = Ti.UI.createView({backgroundColor:'#484850', tabBarHidden:true});
+var editWindow          = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
+var loginWindow         = Ti.UI.createView({backgroundColor:"#484850", layout:"vertical", tabBarHidden:true});
 
-var cameraWin           = Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00'});
+var cameraWin           = Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
 
 if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
-    var tab1            = Ti.UI.createTab({window:cameraWin});
-    tabGroup.addTab(tab1);
+    var cameraWinTab    = Ti.UI.createTab({window:cameraWin});
+    tabGroup.addTab(cameraWinTab);
 }
 
 var admin               = false;

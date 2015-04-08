@@ -1,7 +1,7 @@
 function androidStartScanner(){
 	cameraWin.removeEventListener('androidback', closeDeviceWin);
     cameraWin.activity.invalidateOptionsMenu();
-    picker.startScanning();
+    openScanner();
 }
 
 var closeDeviceWin = function() {
@@ -52,7 +52,7 @@ function setActionListeners(){
             cameraWin.addEventListener('androidback', closeDeviceWin);
         }
         userLog.logIn();
-        picker.stopScanning();
+        closeScanner();
     });
     
     logout.addEventListener('singletap', function() {
@@ -90,7 +90,7 @@ function setActionListeners(){
             cameraWin.setLeftNavButton(backToCamera);
         }
         listPage = true;
-        picker.stopScanning();
+        closeScanner();
     });
     
     cameraWin.addEventListener('focus', function(){

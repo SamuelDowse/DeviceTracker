@@ -22,13 +22,15 @@ function beginiOS(){
     });
     
     backToCamera.addEventListener('singletap', function() {
-        deviceList.setData(platforms);
+    	scannerFile.openScanner();
+        deviceWin.remove(deviceList);
+        cameraWin.remove(deviceWin);
         cameraWin.setLeftNavButton(blank);
         cameraWin.setRightNavButton(blank);
     });
     
     backToDevices.addEventListener('singletap', function() {
-        cameraWin.remove(deviceWindow);
+        cameraWinTab.setWindow(cameraWin);
         cameraWin.setLeftNavButton(backToPlatforms);
         cameraWin.setRightNavButton(blank);
     });
