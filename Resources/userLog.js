@@ -25,17 +25,18 @@ function logIn(){
                     // Set the admin variable to true, if the user is an admin
                     if (e.users[0].admin == 'true'){
                         admin = true;
-                        if (Ti.Platform.osname == 'android')
+                        if (Ti.Platform.osname == 'android'){
                             cameraWin.activity.invalidateOptionsMenu();
+                        }
                     }
                     // Remove the login button from the picker overlay
                     picker.remove(login);
                     // Add the logout button to the picker overlay
                     picker.add(logout);
+                    // Start the scanner again
+                    scannerFile.openScanner();
                     // Remove the loginWindow from the cameraWin
                     cameraWin.remove(loginWindow);
-                    // Start the scanner again
-                    picker.startScanning();
                     // Set the loginPage variable to false
                     loginPage = false;
                 } else {
@@ -50,7 +51,7 @@ function logIn(){
             // Remove the loginWindow from the cameraWin
             cameraWin.remove(loginWindow);
             // Start the scanner again
-            picker.startScanning();
+            scannerFile.openScanner();
         });
         
         // Empty the fields of any data
@@ -92,8 +93,9 @@ function logOut(){
                     // Set the currentUser variable to null
                     currentUser = null;
                     // Refresh the android menu
-                    if (Ti.Platform.osname == 'android')
+                    if (Ti.Platform.osname == 'android'){
                         cameraWin.activity.invalidateOptionsMenu();
+                    }
                 } else {
                     // Alert the user of any errors
                     alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));

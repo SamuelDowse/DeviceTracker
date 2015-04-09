@@ -77,6 +77,7 @@ function setActionListeners(){
         }
         scannedDevices = [];
         uniqueDevices = [];
+        scannedUsers = [];
     });
     
     listDevice.addEventListener('singletap', function() {

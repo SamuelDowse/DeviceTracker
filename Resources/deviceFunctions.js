@@ -450,11 +450,7 @@ function selectDevice(e){
                             deviceIMEIValue.setValue(e.rowData.imei);
                             deviceIDValue = e.rowData.id;
                             androidCurrentPlatform = e.rowData.platform;
-                            if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
-    							cameraWinTab.setWindow(deviceWindow);
-							} else {
-								cameraWin.add(deviceWindow);
-							}
+							cameraWin.add(deviceWindow);
                             if (Ti.Platform.osname == 'android'){
                                 cameraWin.activity.invalidateOptionsMenu();
                             }

@@ -76,6 +76,7 @@ var uniqueUsers         = [];
 var cameraIndexField;
 var currentUser;
 var deviceIDValue;
+var deviceImageURL;
 var platformToRemove;
 // GLOBAL VARIABLES \\
 

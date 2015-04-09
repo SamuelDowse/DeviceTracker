@@ -30,7 +30,7 @@ function beginiOS(){
     });
     
     backToDevices.addEventListener('singletap', function() {
-        cameraWinTab.setWindow(cameraWin);
+        cameraWin.remove(deviceWindow);
         cameraWin.setLeftNavButton(backToPlatforms);
         cameraWin.setRightNavButton(blank);
     });
