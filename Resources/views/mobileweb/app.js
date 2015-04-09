@@ -149,6 +149,9 @@ function beginMobileWeb(){
     
     deviceListTwo.addEventListener('click', function(e){
         if (e.rowData != null){
+            if (searchBar.value.indexOf('Results found') > -1){
+                searchBar.setValue('');
+            }
             var message = e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei;
             if (e.rowData.takenBy != undefined){
                 deviceFunctions.call('GET', 'users/query', {where:{ id:e.rowData.takenBy }}, function(err, data){

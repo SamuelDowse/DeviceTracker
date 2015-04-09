@@ -22,7 +22,7 @@ function beginiOS(){
     });
     
     backToCamera.addEventListener('singletap', function() {
-    	scannerFile.openScanner();
+        scannerFile.openScanner();
         deviceWin.remove(deviceList);
         cameraWin.remove(deviceWin);
         cameraWin.setLeftNavButton(blank);

@@ -1,22 +1,22 @@
 function androidStartScanner(){
-	cameraWin.removeEventListener('androidback', closeDeviceWin);
+    cameraWin.removeEventListener('androidback', closeDeviceWin);
     cameraWin.activity.invalidateOptionsMenu();
     openScanner();
 }
 
 var closeDeviceWin = function() {
     if (listPage){
-    	cameraWin.remove(deviceWin);
-    	androidStartScanner();
-    	listPage = false;
+        cameraWin.remove(deviceWin);
+        androidStartScanner();
+        listPage = false;
     }
     if (listPageTwo) {
-    	deviceList.setData(platforms);
-    	listPageTwo = false;
-    	listPage = true;
+        deviceList.setData(platforms);
+        listPageTwo = false;
+        listPage = true;
     }
     if (devicePage){
-    	var selectedPlatform = [];
+        var selectedPlatform = [];
         for (var a = 0; a < devices.length; a++){
             if (devices[a].platform == androidCurrentPlatform){
                 selectedPlatform.push(devices[a]);
@@ -28,21 +28,21 @@ var closeDeviceWin = function() {
         listPageTwo = true;
     }
     if (addPage){
-    	openScanner();
-    	cameraWin.remove(addWindow);
-    	androidStartScanner();
-    	addPage = false;
+        openScanner();
+        cameraWin.remove(addWindow);
+        androidStartScanner();
+        addPage = false;
     }
     if (editPage){
-    	openScanner();
-    	cameraWin.remove(editWindow);
-    	androidStartScanner();
-    	editPage = false;
+        openScanner();
+        cameraWin.remove(editWindow);
+        androidStartScanner();
+        editPage = false;
     }
     if (loginPage){
-    	cameraWin.remove(loginWindow);
-    	androidStartScanner();
-    	loginPage = false;
+        cameraWin.remove(loginWindow);
+        androidStartScanner();
+        loginPage = false;
     }
 };
 
@@ -61,11 +61,11 @@ function setActionListeners(){
     
     checkout.addEventListener('singletap', function() {
         uniqueDevices = scannedDevices.filter(function(elem, pos) {
-        	return scannedDevices.indexOf(elem) == pos;
+            return scannedDevices.indexOf(elem) == pos;
         });
         scanned = false;
         if (Ti.Platform.osname == 'android'){
-        	cameraWin.activity.invalidateOptionsMenu();
+            cameraWin.activity.invalidateOptionsMenu();
         }
         loggedIn ? deviceFunctions.checkoutDeviceLoggedIn() : deviceFunctions.checkoutDeviceNotLoggedIn();
     });
@@ -104,8 +104,8 @@ function setActionListeners(){
     
 function openScanner(){
     picker = scanditsdk.createView({
-    	width:'100%',
-    	height:'100%'
+        width:'100%',
+        height:'100%'
     });
     picker.init('9VYuOmbDEeOdM21j18UUIGKVF9o+PtHC5XrXuXYCmjQ', 0);
     picker.showSearchBar(false);
@@ -117,7 +117,7 @@ function openScanner(){
         Ti.Media.vibrate();
     });
     picker.setCancelCallback(function(e) {
-    	closeScanner();
+        closeScanner();
     });
     
     !loggedIn ? picker.add(login) : picker.add(logout);
@@ -129,7 +129,7 @@ function openScanner(){
 
 function closeScanner(){
     if (picker != null){
-    	picker.stopScanning();
+        picker.stopScanning();
     }
     !loggedIn ? picker.remove(login) : picker.remove(logout);
     picker.remove(checkout);
