@@ -211,9 +211,6 @@ function checkoutDeviceNotLoggedIn() {
                 }
             }
         });
-        uniqueDevices = [];
-        getPlatforms();
-        getDevices();
     }
 }
 
@@ -341,6 +338,9 @@ function logOutAssigner(){
             currentDevice = null;
             scannedDevices = [];
             scannedUsers = [];
+            uniqueDevices = [];
+            getPlatforms();
+            getDevices();
         } else {
             Ti.API.error('Failed to log out of the assigner account');
         }

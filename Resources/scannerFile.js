@@ -63,7 +63,6 @@ function setActionListeners(){
         uniqueDevices = scannedDevices.filter(function(elem, pos) {
         	return scannedDevices.indexOf(elem) == pos;
         });
-        scannedDevices = [];
         scanned = false;
         if (Ti.Platform.osname == 'android'){
         	cameraWin.activity.invalidateOptionsMenu();
