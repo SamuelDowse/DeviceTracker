@@ -36,6 +36,7 @@ if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')
 var deviceList          = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
 var deviceListTwo       = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
 
+var companyNameInput    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Company Name', color:'white'});
 var deviceIMEIValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI', color:'white'});
 var deviceModelValue    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Model', color:'white'});
 var deviceNameValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Name', color:'white'});
@@ -50,6 +51,7 @@ var deviceWin           = Ti.UI.createView({title:'List Of Devices', backgroundC
 var deviceWindow        = Ti.UI.createView({backgroundColor:'#484850', tabBarHidden:true});
 var editWindow          = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
 var loginWindow         = Ti.UI.createView({backgroundColor:"#484850", layout:"vertical", tabBarHidden:true});
+var newWindow           = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
 
 var cameraWin           = Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
 
@@ -94,6 +96,7 @@ var deleteDevice        = Ti.UI.createButton({title:'Delete', color:'red', backg
 var edit                = Ti.UI.createButton({title:'Edit', color:'white', backgroundImage:'none'});
 var editMobileWeb       = Ti.UI.createButton({title:'Edit', top:'2%', right:'5%'});
 var save                = Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none'});
+var saveCompany         = Ti.UI.createButton({title:'Save', color:'white', backgroundImage:'none', top:15});
 var toDevices           = Ti.UI.createButton({title:'Devices', color:'white', backgroundImage:'none'});
 var upload              = Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'});
 
@@ -118,16 +121,6 @@ if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
     alertDialog.show();
 }
 
-//-- EDIT DEVICE WINDOW--\\
-editWindow.add(devicePlatformValue);
-editWindow.add(deviceOSValue);
-editWindow.add(deviceModelValue);
-editWindow.add(deviceNameValue);
-editWindow.add(deviceIMEIValue);
-editWindow.add(takePhoto);
-editWindow.add(save);
-editWindow.add(deleteDevice);
-//--EDIT DEVICE WINDOW--\\
 //--ADD DEVICE WINDOW--\\
 addWindow.add(devicePlatformValue);
 addWindow.add(deviceOSValue);
@@ -141,6 +134,26 @@ addWindow.add(upload);
 deviceWindow.add(deviceImage);
 deviceWindow.add(deviceInfo);
 //--DISPLAY DEVICE WINDOW--\\
+//-- EDIT DEVICE WINDOW--\\
+editWindow.add(devicePlatformValue);
+editWindow.add(deviceOSValue);
+editWindow.add(deviceModelValue);
+editWindow.add(deviceNameValue);
+editWindow.add(deviceIMEIValue);
+editWindow.add(takePhoto);
+editWindow.add(save);
+editWindow.add(deleteDevice);
+//--EDIT DEVICE WINDOW--\\
+//--LOGIN PAGE WINDOW--\\
+loginWindow.add(userName);
+loginWindow.add(userPassword);
+loginWindow.add(loginButton);
+loginWindow.add(cancelButton);
+//--LOGIN PAGE WINDOW--\\
+//--NEW DEVICE WINDOW--\\
+newWindow.add(companyNameInput);
+newWindow.add(saveCompany);
+//--NEW DEVICE WINDOW--\\
 
 // Set action listeners for the scanner file
 scannerFile.setActionListeners();
@@ -174,4 +187,32 @@ if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
 } else {
     // Open the camera view
     cameraWin.open();
+}
+
+function obtainAll(){
+	if (Ti.Platform.osname == 'mobileweb'){
+        mobileWebSetUp.obtainAll();
+    } else {
+        deviceFunctions.getPlatforms();
+        deviceFunctions.getDevices();
+    }
+}
+
+var companyName = Ti.App.Properties.getString('companyName', 'AppceleratorRocks!');
+if (companyName == 'AppceleratorRocks!'){
+    cameraWin.add(newWindow);
+    saveCompany.addEventListener('return', function(){
+    	companyName = companyNameInput.value;
+        Ti.App.Properties.setString('companyName', companyNameInput.value);
+        obtainAll();
+        cameraWin.remove(newWindow);
+    });
+    saveCompany.addEventListener('click', function(){
+    	companyName = companyNameInput.value;
+        Ti.App.Properties.setString('companyName', companyNameInput.value);
+        obtainAll();
+        cameraWin.remove(newWindow);
+    });
+} else {
+    obtainAll();
 }

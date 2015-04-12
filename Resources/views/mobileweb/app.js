@@ -8,13 +8,15 @@ function obtainAll(){
                 platformCount++;
         }
         for (i = 0; i < platformCount; i++){
-            platforms.push({
-                title:numberOfPlatforms[i].platform,
-                name:numberOfPlatforms[i].platform,
-                color:'white',
-                platform:true,
-                id:numberOfPlatforms[i].id
-            });
+        	if(numberOfPlatforms[i].companyName == companyName){
+	            platforms.push({
+	                title:numberOfPlatforms[i].platform,
+	                name:numberOfPlatforms[i].platform,
+	                color:'white',
+	                platform:true,
+	                id:numberOfPlatforms[i].id
+	            });
+            }
         }
         platforms = platforms.filter(function(elem, pos) {
             return platforms.indexOf(elem) == pos;
@@ -30,20 +32,23 @@ function obtainAll(){
                 deviceCount++;
         }
         for (i = 0; i < deviceCount; i++){
-            devices.push({
-                title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')',
-                model:numberOfDevices[i].model,
-                name:numberOfDevices[i].name,
-                imei:numberOfDevices[i].imei,
-                platform:numberOfDevices[i].platform,
-                osver:numberOfDevices[i].osver,
-                takenBy:numberOfDevices[i].taken_by,
-                image:numberOfDevices[i].photo,
-                id:numberOfDevices[i].id,
-                tags:numberOfDevices[i].tags,
-                color:'white'
-            });
+        	if(numberOfDevices[i].companyName == companyName){
+	            devices.push({
+	                title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')',
+	                model:numberOfDevices[i].model,
+	                name:numberOfDevices[i].name,
+	                imei:numberOfDevices[i].imei,
+	                platform:numberOfDevices[i].platform,
+	                osver:numberOfDevices[i].osver,
+	                takenBy:numberOfDevices[i].taken_by,
+	                image:numberOfDevices[i].photo,
+	                id:numberOfDevices[i].id,
+	                tags:numberOfDevices[i].tags,
+	                color:'white'
+	            });
+            }
         }
+        searchBar.setValue('');
     });
 }
 
@@ -84,12 +89,11 @@ function searchDevices(){
  * Everything visual outside of the scanning screen is set up in here.
  */
 function beginMobileWeb(){
-    obtainAll();
-    
     var appcLogo      = Ti.UI.createImageView({image:'assets/logo.png', left:10});
     var seperator     = Ti.UI.createView({backgroundColor:'#242428', width:'3', right:0});
     var searchView    = Ti.UI.createView({backgroundColor:'#B50D00', width:'100%', height:'5%', top:0});
     
+    companyNameInput.setWidth('30%');
     deviceList.setBackgroundColor('#303035');
     deviceList.setBottom(0);
     deviceList.setHeight('95%');
@@ -98,25 +102,25 @@ function beginMobileWeb(){
     deviceWindow.setBottom(0);
     deviceWindow.setHeight('95%');
     
-    appcLogo.addEventListener('click', function(e){
-        searchBar.setValue('');
+    appcLogo.addEventListener('click', function(){
+        searchBar.setValue('Refreshing device list!');
         deviceListTwo.setData([]);
         cameraWin.remove(deviceWindow);
         obtainAll();
     });
     
-    searchBar.addEventListener('click', function(e){
+    searchBar.addEventListener('click', function(){
         searchBar.setColor('black');
         if (searchBar.value.indexOf('Results found') > -1){
             searchBar.setValue('');
         }
     });
     
-    searchBar.addEventListener('blur', function(e){
+    searchBar.addEventListener('blur', function(){
         searchBar.setColor('#93939e');
     });
     
-    searchBar.addEventListener('return', function(e){
+    searchBar.addEventListener('return', function(){
         searchValue = searchBar.value;
         searchBar.setValue('');
         searchDevices();
@@ -203,3 +207,4 @@ function beginMobileWeb(){
 }
 
 exports.beginMobileWeb = beginMobileWeb;
+exports.obtainAll = obtainAll;

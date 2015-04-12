@@ -28,13 +28,11 @@ var closeDeviceWin = function() {
         listPageTwo = true;
     }
     if (addPage){
-        openScanner();
         cameraWin.remove(addWindow);
         androidStartScanner();
         addPage = false;
     }
     if (editPage){
-        openScanner();
         cameraWin.remove(editWindow);
         androidStartScanner();
         editPage = false;
@@ -51,6 +49,9 @@ function setActionListeners(){
         if (Ti.Platform.osname == 'android'){
             cameraWin.addEventListener('androidback', closeDeviceWin);
         }
+        userName.setValue(null);
+        userPassword.setValue(null);
+        cameraWin.add(loginWindow);
         userLog.logIn();
         closeScanner();
     });
@@ -97,8 +98,6 @@ function setActionListeners(){
         devices = [];
         platforms = [];
         uniquePlatforms = [];
-        deviceFunctions.getPlatforms();
-        deviceFunctions.getDevices();
     });
 }
     

@@ -276,7 +276,10 @@ function getPlatforms() {
             Cloud.Objects.query({
                 classname:'Platforms',
                 order:'platform',
-                limit:50
+                limit:1000,
+                where:{
+                	companyName:companyName
+                }
             }, function (e){
                 for (var i = 0; i < e.Platforms.length; i++) {
                     var devPlat = e.Platforms[i];
@@ -306,7 +309,10 @@ function getDevices() {
             Cloud.Objects.query({
                 classname:'Device',
                 order:'-osver, model',
-                limit:1000
+                limit:1000,
+                where:{
+                	companyName:companyName
+                }
             }, function (e) {
                 for (var i = 0; i < e.Device.length; i++) {
                     var device = e.Device[i];
@@ -362,6 +368,7 @@ function saveDevice(){
                 model:modelString,
                 name:deviceNameValue.value,
                 imei:deviceIMEIValue.value,
+                companyName:companyName,
                 tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
             }
         }, function (e) {
@@ -478,6 +485,7 @@ function uploadDevice(){
                     model:modelString,
                     osver:deviceOSValue.value,
                     imei:deviceIMEIValue.value,
+                    companyName:companyName,
                     tags:deviceIMEIValue.value+','+deviceNameValue.value+','+modelName+','+modelNickname+','+deviceOSValue.value+','+devicePlatformValue.value
                 }
             }, function (e){
@@ -496,7 +504,10 @@ function uploadDevice(){
             Cloud.Objects.query({
                 classname:'Platforms',
                 order:'platform',
-                limit:50
+                limit:50,
+                where:{
+                	companyName:companyName
+                }
             }, function (e){
                 for (var i = 0; i < e.Platforms.length; i++) {
                     if (devicePlatformValue.value == e.Platforms[i].platform){
@@ -508,7 +519,8 @@ function uploadDevice(){
                         classname:'Platforms',
                         acl_name:'AllAccess',
                         fields:{
-                            platform:devicePlatformValue.value
+                            platform:devicePlatformValue.value,
+                            companyName:companyName
                         }
                     }, function (e){
                         if (!e.success){
