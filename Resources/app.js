@@ -42,7 +42,7 @@ var deviceModelValue    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hin
 var deviceNameValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Name', color:'white'});
 var deviceOSValue       = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'OS Version', color:'white'});
 var devicePlatformValue = Ti.UI.createTextField({font:{fontSize:18}, top:20, hintText:'Platform', color:'white'});
-var searchBar           = Ti.UI.createTextField({font:{fontSize:18}, hintText:'Search', color:'#93939e', backgroundColor:'white', right:10, width:'20%'});
+var searchBar           = Ti.UI.createTextField({font:{fontSize:18}, hintText:'Search', color:'#93939e', backgroundColor:'white', right:50, width:'20%'});
 var userName            = Ti.UI.createTextField({top:50, autocorrect:false, hintText:'Username', color:'white'});
 var userPassword        = Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password', color:'white'});
 
@@ -100,12 +100,19 @@ var saveCompany         = Ti.UI.createButton({title:'Save', color:'white', backg
 var toDevices           = Ti.UI.createButton({title:'Devices', color:'white', backgroundImage:'none'});
 var upload              = Ti.UI.createButton({title:'Upload', color:'white', backgroundImage:'none'});
 
+var nameInput           = Ti.UI.createTextField({width:'90%', top:'11%', backgroundColor:'white'});
+var passwordInput       = Ti.UI.createTextField({width:'90%', top:'14%', backgroundColor:'white', passwordMask:true});
+var confirmInput        = Ti.UI.createTextField({width:'90%', top:'14%', backgroundColor:'white', passwordMask:true});
+var adminInput          = Ti.UI.createSwitch({left:'5%', top:'13%', value:false}); 
+
 var addPage             = false;
 var devicePage          = false;
 var editPage            = false;
 var listPage            = false;
 var listPageTwo         = false;
 var loginPage           = false;
+
+var nameSplit           = [];
 
 var androidCurrentPlatform;
 var searchValue;
@@ -190,7 +197,7 @@ if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
 }
 
 function obtainAll(){
-	if (Ti.Platform.osname == 'mobileweb'){
+    if (Ti.Platform.osname == 'mobileweb'){
         mobileWebSetUp.obtainAll();
     } else {
         deviceFunctions.getPlatforms();
@@ -202,13 +209,13 @@ var companyName = Ti.App.Properties.getString('companyName', 'AppceleratorRocks!
 if (companyName == 'AppceleratorRocks!'){
     cameraWin.add(newWindow);
     saveCompany.addEventListener('return', function(){
-    	companyName = companyNameInput.value;
+        companyName = companyNameInput.value;
         Ti.App.Properties.setString('companyName', companyNameInput.value);
         obtainAll();
         cameraWin.remove(newWindow);
     });
     saveCompany.addEventListener('click', function(){
-    	companyName = companyNameInput.value;
+        companyName = companyNameInput.value;
         Ti.App.Properties.setString('companyName', companyNameInput.value);
         obtainAll();
         cameraWin.remove(newWindow);

@@ -8,14 +8,14 @@ function obtainAll(){
                 platformCount++;
         }
         for (i = 0; i < platformCount; i++){
-        	if(numberOfPlatforms[i].companyName == companyName){
-	            platforms.push({
-	                title:numberOfPlatforms[i].platform,
-	                name:numberOfPlatforms[i].platform,
-	                color:'white',
-	                platform:true,
-	                id:numberOfPlatforms[i].id
-	            });
+            if(numberOfPlatforms[i].companyName == companyName){
+                platforms.push({
+                    title:numberOfPlatforms[i].platform,
+                    name:numberOfPlatforms[i].platform,
+                    color:'white',
+                    platform:true,
+                    id:numberOfPlatforms[i].id
+                });
             }
         }
         platforms = platforms.filter(function(elem, pos) {
@@ -32,20 +32,20 @@ function obtainAll(){
                 deviceCount++;
         }
         for (i = 0; i < deviceCount; i++){
-        	if(numberOfDevices[i].companyName == companyName){
-	            devices.push({
-	                title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')',
-	                model:numberOfDevices[i].model,
-	                name:numberOfDevices[i].name,
-	                imei:numberOfDevices[i].imei,
-	                platform:numberOfDevices[i].platform,
-	                osver:numberOfDevices[i].osver,
-	                takenBy:numberOfDevices[i].taken_by,
-	                image:numberOfDevices[i].photo,
-	                id:numberOfDevices[i].id,
-	                tags:numberOfDevices[i].tags,
-	                color:'white'
-	            });
+            if(numberOfDevices[i].companyName == companyName){
+                devices.push({
+                    title:numberOfDevices[i].model+' ('+numberOfDevices[i].osver+')',
+                    model:numberOfDevices[i].model,
+                    name:numberOfDevices[i].name,
+                    imei:numberOfDevices[i].imei,
+                    platform:numberOfDevices[i].platform,
+                    osver:numberOfDevices[i].osver,
+                    takenBy:numberOfDevices[i].taken_by,
+                    image:numberOfDevices[i].photo,
+                    id:numberOfDevices[i].id,
+                    tags:numberOfDevices[i].tags,
+                    color:'white'
+                });
             }
         }
         searchBar.setValue('');
@@ -84,14 +84,61 @@ function searchDevices(){
     deviceListTwo.setData(foundArray);
 }
 
+function uploadUser(){
+    deviceFunctions.call('POST', 'users/create', {
+        'first_name':nameSplit[0],
+        'last_name':nameSplit[1],
+        'username':nameInput.value,
+        'password':passwordInput.value,
+        'password_confirmation':confirmInput.value,
+        'admin': adminInput.value
+    }, function(err, data){
+        if (data.meta.respone == 200){
+            alert(nameSplit[0]+' '+nameSplit[1]+' has been created!');
+        }
+    });
+}
+
 /**
  * Set up the UI for a mobileweb device.
  * Everything visual outside of the scanning screen is set up in here.
  */
 function beginMobileWeb(){
+    var addUser       = Ti.UI.createButton({title:'Add User', color:'white', backgroundImage:'none'});
+    var createUser    = Ti.UI.createButton({title:'Create User', color:'white', backgroundColor:'#880015', borderRadius:1, borderWidth:2, borderColor:'#880015', top:'5%'});
+    
     var appcLogo      = Ti.UI.createImageView({image:'assets/logo.png', left:10});
+    var close         = Ti.UI.createImageView({image:'assets/close.png', top:0, right:0});
+    var dropdown      = Ti.UI.createImageView({image:'assets/dropdown.png', right:10});
+    
+    var addUserView   = Ti.UI.createView({backgroundColor:'#484850', width:'50%', height:'50%', borderRadius:1, borderWidth:3, borderColor:'#880015'});
+    var dimUserView   = Ti.UI.createView({backgroundColor:'rgba(0,0,0,0.5)', width:'100%', height:'100%'});
+    var menuBar       = Ti.UI.createView({backgroundColor:'#242428', top:'5%', width:87, height:39, right:0, borderRadius:1, borderWidth:3, borderColor:'black'});
     var seperator     = Ti.UI.createView({backgroundColor:'#242428', width:'3', right:0});
+    var seperatorTwo  = Ti.UI.createView({backgroundColor:'#242428', width:'3', left:'30%'});
     var searchView    = Ti.UI.createView({backgroundColor:'#B50D00', width:'100%', height:'5%', top:0});
+    var titleBox      = Ti.UI.createView({backgroundColor:'#303035', width:'30%', left:0, layout:'vertical'});
+    var inputBox      = Ti.UI.createView({backgroundColor:'#484850', width:'70%', right:0, layout:'vertical'});
+    
+    var nameLabel     = Ti.UI.createLabel({text:'Username', top:'15%', right:5, color:'white'});
+    var passwordLabel = Ti.UI.createLabel({text:'Password', top:'15%', right:5, color:'white'});
+    var confirmLabel  = Ti.UI.createLabel({text:'Confirm', top:'15%', right:5, color:'white'});
+    var adminLabel    = Ti.UI.createLabel({text:'Admin', top:'15%', right:5, color:'white'});
+    
+    var alternateDrop = false;
+    var closeWindow = 0;
+    
+    titleBox.add(nameLabel);
+    titleBox.add(passwordLabel);
+    titleBox.add(confirmLabel);
+    titleBox.add(adminLabel);
+    
+    inputBox.add(close);
+    inputBox.add(nameInput);
+    inputBox.add(passwordInput);
+    inputBox.add(confirmInput);
+    inputBox.add(adminInput);
+    inputBox.add(createUser);
     
     companyNameInput.setWidth('30%');
     deviceList.setBackgroundColor('#303035');
@@ -101,15 +148,72 @@ function beginMobileWeb(){
     deviceList.setWidth('30%');
     deviceWindow.setBottom(0);
     deviceWindow.setHeight('95%');
+    menuBar.add(addUser);
+    
+    addUser.addEventListener('click', function(){
+        cameraWin.remove(menuBar);
+        alternateDrop = false;
+        cameraWin.add(dimUserView);
+    });
     
     appcLogo.addEventListener('click', function(){
         searchBar.setValue('Refreshing device list!');
         deviceListTwo.setData([]);
         cameraWin.remove(deviceWindow);
+        cameraWin.remove(menuBar);
+        alternateDrop = false;
         obtainAll();
     });
     
+    close.addEventListener('click', function(){
+        cameraWin.remove(dimUserView);
+        nameInput.setValue('');
+        passwordInput.setValue('');
+        confirmInput.setValue('');
+        adminInput.setValue(false);
+    });
+    
+    createUser.addEventListener('click', function(){
+        nameSplit = nameInput.value.split(" "); 
+        uploadUser();
+        cameraWin.remove(dimUserView);
+        nameInput.setValue('');
+        passwordInput.setValue('');
+        confirmInput.setValue('');
+        adminInput.setValue(false);
+    });
+    
+    addUserView.addEventListener('click', function(){
+        closeWindow = 1;
+    });
+    
+    adminInput.addEventListener('click', function(){
+        closeWindow = 1;
+    });
+    
+    dimUserView.addEventListener('click', function(){
+        if (closeWindow == 0){
+            cameraWin.remove(dimUserView);
+            nameInput.setValue('');
+            passwordInput.setValue('');
+            confirmInput.setValue('');
+            adminInput.setValue(false);
+        }
+        closeWindow = 0;
+    });
+    
+    dropdown.addEventListener('click', function(){
+        if(alternateDrop == false){
+            cameraWin.add(menuBar);
+        } else {
+            cameraWin.remove(menuBar);
+        }
+        alternateDrop = !alternateDrop;
+    });
+    
     searchBar.addEventListener('click', function(){
+        cameraWin.remove(menuBar);
+        alternateDrop = false;
         searchBar.setColor('black');
         if (searchBar.value.indexOf('Results found') > -1){
             searchBar.setValue('');
@@ -127,15 +231,20 @@ function beginMobileWeb(){
         cameraWin.remove(deviceWindow);
     });
 
+    addUserView.add(titleBox);
+    addUserView.add(inputBox);
+    addUserView.add(seperatorTwo);
     cameraWin.add(deviceList);
     cameraWin.add(deviceListTwo);
     cameraWin.add(searchView);
     deviceList.add(seperator);
     deviceWindow.add(deviceImage);    
     deviceWindow.add(deviceInfo);
+    dimUserView.add(addUserView);
     searchView.add(appcLogo);
+    searchView.add(dropdown);
     searchView.add(searchBar);
-
+    
     // If the user taps on the deviceList
     deviceList.addEventListener('click', function(e){
         if (e.rowData != null){

@@ -32,8 +32,9 @@ function logIn(){
         });
         
         cancelButton.addEventListener("click", function() {
-            cameraWin.remove(loginWindow);
             scannerFile.openScanner();
+            cameraWin.remove(loginWindow);
+            loginPage = false;
         });
     }
 }

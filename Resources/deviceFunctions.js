@@ -278,7 +278,7 @@ function getPlatforms() {
                 order:'platform',
                 limit:1000,
                 where:{
-                	companyName:companyName
+                    companyName:companyName
                 }
             }, function (e){
                 for (var i = 0; i < e.Platforms.length; i++) {
@@ -311,7 +311,7 @@ function getDevices() {
                 order:'-osver, model',
                 limit:1000,
                 where:{
-                	companyName:companyName
+                    companyName:companyName
                 }
             }, function (e) {
                 for (var i = 0; i < e.Device.length; i++) {
@@ -506,7 +506,7 @@ function uploadDevice(){
                 order:'platform',
                 limit:50,
                 where:{
-                	companyName:companyName
+                    companyName:companyName
                 }
             }, function (e){
                 for (var i = 0; i < e.Platforms.length; i++) {
