@@ -91,11 +91,35 @@ function uploadUser(){
         'username':nameInput.value,
         'password':passwordInput.value,
         'password_confirmation':confirmInput.value,
-        'admin': adminInput.value
+        'admin': adminInput.value,
+        'role':companyName
     }, function(err, data){
-        if (data.meta.respone == 200){
-            alert(nameSplit[0]+' '+nameSplit[1]+' has been created!');
+        if (data.meta.code == 200){
+            alert(nameInput.value +' has been created!');
         }
+        nameInput.setValue('');
+        passwordInput.setValue('');
+        confirmInput.setValue('');
+        adminInput.setValue(false);
+    });
+}
+
+function queryUsers(){
+	deviceFunctions.call('GET', 'users/query', {
+		'order':'username',
+	}, function(err, data){
+		var usersFound = [];
+		var numberOfUsers = data.response.users;
+		for (var a = 0; a < numberOfUsers.length; a++){
+		    if (data.response.users[a].role == companyName)
+                usersFound.push({
+                    title:data.response.users[a].username,
+                    id:data.response.users[a].id
+                });
+        }
+        deviceListTwo.setData(usersFound);
+        searchBar.setValue('');
+        userQuery = true;
     });
 }
 
@@ -104,8 +128,9 @@ function uploadUser(){
  * Everything visual outside of the scanning screen is set up in here.
  */
 function beginMobileWeb(){
-    var addUser       = Ti.UI.createButton({title:'Add User', color:'white', backgroundImage:'none'});
+    var addUser       = Ti.UI.createButton({title:'Add User', color:'white', backgroundImage:'none', height:39, top:0});
     var createUser    = Ti.UI.createButton({title:'Create User', color:'white', backgroundColor:'#880015', borderRadius:1, borderWidth:2, borderColor:'#880015', top:'5%'});
+    var queryUser     = Ti.UI.createButton({title:'Query User', color:'white', backgroundImage:'none', height:39, top:30});
     
     var appcLogo      = Ti.UI.createImageView({image:'assets/logo.png', left:10});
     var close         = Ti.UI.createImageView({image:'assets/close.png', top:0, right:0});
@@ -113,7 +138,7 @@ function beginMobileWeb(){
     
     var addUserView   = Ti.UI.createView({backgroundColor:'#484850', width:'50%', height:'50%', borderRadius:1, borderWidth:3, borderColor:'#880015'});
     var dimUserView   = Ti.UI.createView({backgroundColor:'rgba(0,0,0,0.5)', width:'100%', height:'100%'});
-    var menuBar       = Ti.UI.createView({backgroundColor:'#242428', top:'5%', width:87, height:39, right:0, borderRadius:1, borderWidth:3, borderColor:'black'});
+    var menuBar       = Ti.UI.createView({backgroundColor:'#242428', top:'5%', width:87, height:78, right:0, borderRadius:1, borderWidth:3, borderColor:'black'});
     var seperator     = Ti.UI.createView({backgroundColor:'#242428', width:'3', right:0});
     var seperatorTwo  = Ti.UI.createView({backgroundColor:'#242428', width:'3', left:'30%'});
     var searchView    = Ti.UI.createView({backgroundColor:'#B50D00', width:'100%', height:'5%', top:0});
@@ -126,7 +151,7 @@ function beginMobileWeb(){
     var adminLabel    = Ti.UI.createLabel({text:'Admin', top:'15%', right:5, color:'white'});
     
     var alternateDrop = false;
-    var closeWindow = 0;
+    var closeWindow   = 0;
     
     titleBox.add(nameLabel);
     titleBox.add(passwordLabel);
@@ -149,11 +174,20 @@ function beginMobileWeb(){
     deviceWindow.setBottom(0);
     deviceWindow.setHeight('95%');
     menuBar.add(addUser);
+    menuBar.add(queryUser);
     
     addUser.addEventListener('click', function(){
         cameraWin.remove(menuBar);
         alternateDrop = false;
         cameraWin.add(dimUserView);
+    });
+    
+    addUserView.addEventListener('click', function(){
+        closeWindow = 1;
+    });
+    
+    adminInput.addEventListener('click', function(){
+        closeWindow = 1;
     });
     
     appcLogo.addEventListener('click', function(){
@@ -162,6 +196,7 @@ function beginMobileWeb(){
         cameraWin.remove(deviceWindow);
         cameraWin.remove(menuBar);
         alternateDrop = false;
+        userQuery = false;
         obtainAll();
     });
     
@@ -177,18 +212,6 @@ function beginMobileWeb(){
         nameSplit = nameInput.value.split(" "); 
         uploadUser();
         cameraWin.remove(dimUserView);
-        nameInput.setValue('');
-        passwordInput.setValue('');
-        confirmInput.setValue('');
-        adminInput.setValue(false);
-    });
-    
-    addUserView.addEventListener('click', function(){
-        closeWindow = 1;
-    });
-    
-    adminInput.addEventListener('click', function(){
-        closeWindow = 1;
     });
     
     dimUserView.addEventListener('click', function(){
@@ -211,6 +234,10 @@ function beginMobileWeb(){
         alternateDrop = !alternateDrop;
     });
     
+    searchBar.addEventListener('blur', function(){
+        searchBar.setColor('#93939e');
+    });
+    
     searchBar.addEventListener('click', function(){
         cameraWin.remove(menuBar);
         alternateDrop = false;
@@ -220,15 +247,20 @@ function beginMobileWeb(){
         }
     });
     
-    searchBar.addEventListener('blur', function(){
-        searchBar.setColor('#93939e');
-    });
-    
     searchBar.addEventListener('return', function(){
         searchValue = searchBar.value;
         searchBar.setValue('');
         searchDevices();
         cameraWin.remove(deviceWindow);
+        userQuery = false;
+    });
+    
+    queryUser.addEventListener('click', function(){
+    	searchBar.setValue('Obtaining Users!');
+    	cameraWin.remove(menuBar);
+    	cameraWin.remove(deviceWindow);
+        alternateDrop = false;
+        queryUsers();
     });
 
     addUserView.add(titleBox);
@@ -262,55 +294,61 @@ function beginMobileWeb(){
     
     deviceListTwo.addEventListener('click', function(e){
         if (e.rowData != null){
-            if (searchBar.value.indexOf('Results found') > -1){
-                searchBar.setValue('');
-            }
-            var message = e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei;
-            if (e.rowData.takenBy != undefined){
-                deviceFunctions.call('GET', 'users/query', {where:{ id:e.rowData.takenBy }}, function(err, data){
-                    var obtainedData = data.response;
-                    var takenByID = e.rowData.takenBy;
-                    deviceInfo.setText(message+'\nTaken By: '+obtainedData.users[0].first_name+' '+obtainedData.users[0].last_name);
-                });
-            } else {
-                var takenByID = null;
-                deviceInfo.setText(message+'\nNot In Use');
-            }
-            deviceFunctions.call('GET', 'users/query', {where:{ id:takenByID }}, function(err, data){
-                var test = data.response;
-                if (e.rowData.image == null){
-                    deviceImageURL = 'assets/nodevice.png';
-                } else {
-                    if (Ti.Platform.displayCaps.platformWidth > 0 && Ti.Platform.displayCaps.platformWidth < 240){
-                        deviceImageURL = e.rowData.image.urls['thumb_100'];
-                    } else if (Ti.Platform.displayCaps.platformWidth > 241 && Ti.Platform.displayCaps.platformWidth < 500){
-                        deviceImageURL = e.rowData.image.urls['small_240'];
-                    } else if (Ti.Platform.displayCaps.platformWidth > 501 && Ti.Platform.displayCaps.platformWidth < 640){
-                        deviceImageURL = e.rowData.image.urls['medium_500'];
-                    } else if (Ti.Platform.displayCaps.platformWidth > 641 && Ti.Platform.displayCaps.platformWidth < 1024){
-                        deviceImageURL = e.rowData.image.urls['medium_640'];
-                    } else if (Ti.Platform.displayCaps.platformWidth > 1025){
-                        deviceImageURL = e.rowData.image.urls['large_1024'];
-                    }
-                }
-                deviceImage.setImage(deviceImageURL);
-                devicePlatformValue.setValue(e.rowData.platform);
-                deviceOSValue.setValue(e.rowData.osver);
-                deviceModelValue.setValue(e.rowData.model);
-                deviceNameValue.setValue(e.rowData.name);
-                deviceIMEIValue.setValue(e.rowData.imei);
-                deviceIDValue = e.rowData.id;
-                var alternateImage = false;
-                deviceImage.addEventListener('dblclick', function(){
-                    if(alternateImage == false){
-                        deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.imei+'","object":"device"}');
-                    } else {
-                        deviceImage.setImage(deviceImageURL);
-                    }
-                    alternateImage = !alternateImage;
-                });
-                cameraWin.add(deviceWindow);
-            });
+        	if (userQuery == true){
+        		deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.id+'","object":"user"}');
+        		deviceInfo.setText('User: '+e.rowData.title);
+        		cameraWin.add(deviceWindow);
+        	} else {
+	            if (searchBar.value.indexOf('Results found') > -1){
+	                searchBar.setValue('');
+	            }
+	            var message = e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei;
+	            if (e.rowData.takenBy != undefined){
+		            deviceFunctions.call('GET', 'users/query', {where:{ id:e.rowData.takenBy }}, function(err, data){
+	                    var obtainedData = data.response;
+	                    var takenByID = e.rowData.takenBy;
+	                    deviceInfo.setText(message+'\nTaken By: '+obtainedData.users[0].first_name+' '+obtainedData.users[0].last_name);
+	                });
+	            } else {
+		            var takenByID = null;
+	                deviceInfo.setText(message+'\nNot In Use');
+	            }
+	            deviceFunctions.call('GET', 'users/query', {where:{ id:takenByID }}, function(err, data){
+	                var test = data.response;
+	                if (e.rowData.image == null){
+	                    deviceImageURL = 'assets/nodevice.png';
+	                } else {
+	                    if (Ti.Platform.displayCaps.platformWidth > 0 && Ti.Platform.displayCaps.platformWidth < 240){
+	                        deviceImageURL = e.rowData.image.urls['thumb_100'];
+	                    } else if (Ti.Platform.displayCaps.platformWidth > 241 && Ti.Platform.displayCaps.platformWidth < 500){
+	                        deviceImageURL = e.rowData.image.urls['small_240'];
+	                    } else if (Ti.Platform.displayCaps.platformWidth > 501 && Ti.Platform.displayCaps.platformWidth < 640){
+	                        deviceImageURL = e.rowData.image.urls['medium_500'];
+	                    } else if (Ti.Platform.displayCaps.platformWidth > 641 && Ti.Platform.displayCaps.platformWidth < 1024){
+	                        deviceImageURL = e.rowData.image.urls['medium_640'];
+	                    } else if (Ti.Platform.displayCaps.platformWidth > 1025){
+	                        deviceImageURL = e.rowData.image.urls['large_1024'];
+	                    }
+	                }
+	            	deviceImage.setImage(deviceImageURL);
+	                devicePlatformValue.setValue(e.rowData.platform);
+	                deviceOSValue.setValue(e.rowData.osver);
+	                deviceModelValue.setValue(e.rowData.model);
+	                deviceNameValue.setValue(e.rowData.name);
+	                deviceIMEIValue.setValue(e.rowData.imei);
+	                deviceIDValue = e.rowData.id;
+	                var alternateImage = false;
+	                deviceImage.addEventListener('dblclick', function(){
+	                    if(alternateImage == false){
+	                        deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.imei+'","object":"device"}');
+	                    } else {
+	                        deviceImage.setImage(deviceImageURL);
+	                    }
+	                    alternateImage = !alternateImage;
+	                });
+	            cameraWin.add(deviceWindow);
+	            });
+	        }
         }
     });
 }

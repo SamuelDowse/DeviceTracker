@@ -48,7 +48,7 @@ function beginAndroid(){
     activity.onPrepareOptionsMenu = function(e) {
         var menu = e.menu;
         menu.findItem(ADD).setVisible(admin && listPage);
-        menu.findItem(REFRESH).setVisible(listPage);
+        menu.findItem(REFRESH).setVisible(listPage || listPageTwo);
         menu.findItem(EDIT).setVisible(admin && devicePage);
         menu.findItem(CLEAR).setVisible(!devicePage && !listPage && !addPage && !editPage && scanned);
     };

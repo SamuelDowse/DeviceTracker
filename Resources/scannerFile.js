@@ -1,6 +1,5 @@
 function androidStartScanner(){
     cameraWin.removeEventListener('androidback', closeDeviceWin);
-    cameraWin.activity.invalidateOptionsMenu();
     openScanner();
 }
 
@@ -42,22 +41,19 @@ var closeDeviceWin = function() {
         androidStartScanner();
         loginPage = false;
     }
+    cameraWin.activity.invalidateOptionsMenu();
 };
 
 function setActionListeners(){
     login.addEventListener('singletap', function() {
-        if (Ti.Platform.osname == 'android'){
-            cameraWin.addEventListener('androidback', closeDeviceWin);
+        if (!loggedIn){
+            if (Ti.Platform.osname == 'android'){
+                cameraWin.addEventListener('androidback', closeDeviceWin);
+            }
+            userLog.logIn();
+        } else {
+            userLog.logOut();	      	
         }
-        userName.setValue(null);
-        userPassword.setValue(null);
-        cameraWin.add(loginWindow);
-        userLog.logIn();
-        closeScanner();
-    });
-    
-    logout.addEventListener('singletap', function() {
-        userLog.logOut();
     });
     
     checkout.addEventListener('singletap', function() {
@@ -119,7 +115,7 @@ function openScanner(){
         closeScanner();
     });
     
-    !loggedIn ? picker.add(login) : picker.add(logout);
+    picker.add(login);
     picker.add(checkout);
     picker.add(listDevice);
     cameraWin.add(picker);
@@ -130,7 +126,7 @@ function closeScanner(){
     if (picker != null){
         picker.stopScanning();
     }
-    !loggedIn ? picker.remove(login) : picker.remove(logout);
+    picker.remove(login);
     picker.remove(checkout);
     picker.remove(listDevice);
     cameraWin.remove(picker);

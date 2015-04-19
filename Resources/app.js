@@ -20,7 +20,6 @@ var cancelButton        = Ti.UI.createButton({title:"Cancel", top:30, color:'whi
 var listDevice          = Ti.UI.createButton({backgroundImage:'assets/list.png', bottom:'5%', right:'13%', width:50, height:50});
 var login               = Ti.UI.createButton({backgroundImage:'assets/login.png', bottom:'5%', left:'13%', width:50, height:50});
 var loginButton         = Ti.UI.createButton({title:"Log In", top:30, color:'white'});
-var logout              = Ti.UI.createButton({backgroundImage:'assets/logout.png', bottom:'5%', left:'13%', width:50, height:50});
 var takePhoto           = Ti.UI.createButton({title:'Take Photo of Device', top:15, font:{fontSize:18}});
 
 var deviceImage         = Ti.UI.createImageView({top:20, bottom:20, height:'50%'});
@@ -47,13 +46,13 @@ var userName            = Ti.UI.createTextField({top:50, autocorrect:false, hint
 var userPassword        = Ti.UI.createTextField({top:40, autocorrect:false, passwordMask:true, hintText:'Password', color:'white'});
 
 var addWindow           = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
-var deviceWin           = Ti.UI.createView({title:'List Of Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
+var deviceWin           = Ti.UI.createView({backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
 var deviceWindow        = Ti.UI.createView({backgroundColor:'#484850', tabBarHidden:true});
 var editWindow          = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
 var loginWindow         = Ti.UI.createView({backgroundColor:"#484850", layout:"vertical", tabBarHidden:true});
 var newWindow           = Ti.UI.createView({backgroundColor:'#484850', layout:'vertical', tabBarHidden:true});
 
-var cameraWin           = Ti.UI.createWindow({title:'Scan Devices', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
+var cameraWin           = Ti.UI.createWindow({title:'Device Tracker', backgroundColor:'#484850', barColor:'#B50D00', tabBarHidden:true});
 
 if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
     var cameraWinTab    = Ti.UI.createTab({window:cameraWin});
@@ -63,6 +62,7 @@ if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
 var admin               = false;
 var loggedIn            = false;
 var scanned             = false;
+var userQuery           = false;
 
 var photo               = null;
 

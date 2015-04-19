@@ -2,25 +2,13 @@
  * Open the camera to let the user take a picture.
  */
 function addPicture(){
-    // Check if the user is using mobileweb. If not, carry on.
     if (Ti.Platform.osname != 'mobileweb'){
-        // Open the camera UI.
         Ti.Media.showCamera({
-            // If a picture was taken, obtain the photo.
-            success:function(e){
-                photo = e.media;
-            },
-            // If the user cancels, do nothing.
-            cancel:function(){
-                return;
-            },
-            // If there was an error!
+            success:function(e){ photo = e.media; },
+            cancel:function(){ return; },
             error:function(error){
-                // Alert the user of the error!
-                var a = Ti.UI.createAlertDialog({
-                    title:'Error Occurred'
-                });
-                (error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Device Tracker is unable to connect to your camera, do you have one?') : a.setMessage('Unexpected error: '+error.code);
+                var a = Ti.UI.createAlertDialog({ title:'Error Occurred' });
+                (error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Unable to connect to your camera!') : a.setMessage('Unexpected error: '+error.code);
                 a.show();
             }
         });
@@ -29,8 +17,8 @@ function addPicture(){
 
 function call(method, url, data, callback){
     var xhr = new XMLHttpRequest(),
-    appKey = Ti.App.Properties.getString('acs-api-key-'+Ti.App.deployType);
-    queryString = '&';
+        appKey = Ti.App.Properties.getString('acs-api-key-'+Ti.App.deployType),
+        queryString = '&';
     xhr.onreadystatechange = function(){
         if(xhr.readyState == 4){
             try {
@@ -504,7 +492,7 @@ function uploadDevice(){
             Cloud.Objects.query({
                 classname:'Platforms',
                 order:'platform',
-                limit:50,
+                limit:1000,
                 where:{
                     companyName:companyName
                 }

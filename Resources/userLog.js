@@ -6,6 +6,11 @@
 function logIn(){
     if(!Ti.Network.networkType == Ti.Network.NETWORK_NONE){
         loginPage = true;
+        userName.setValue(null);
+        userPassword.setValue(null);
+        scannerFile.closeScanner();
+        cameraWin.add(loginWindow);
+        
         loginButton.addEventListener("click", function() {
             Cloud.Users.login({
                 login: userName.value,
@@ -20,8 +25,7 @@ function logIn(){
                             cameraWin.activity.invalidateOptionsMenu();
                         }
                     }
-                    picker.remove(login);
-                    picker.add(logout);
+                    login.setBackgroundImage('assets/logout.png');
                     scannerFile.openScanner();
                     cameraWin.remove(loginWindow);
                     loginPage = false;
@@ -48,8 +52,7 @@ function logOut(){
         if (loggedIn == true){
             Cloud.Users.logout(function (e) {
                 if (e.success) {
-                    picker.remove(logout);
-                    picker.add(login);
+                    login.setBackgroundImage('assets/login.png');
                     loggedIn = false;
                     admin = false;
                     currentUser = null;
