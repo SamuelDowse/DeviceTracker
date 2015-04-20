@@ -288,6 +288,7 @@ function beginMobileWeb(){
                     }
                 }
                 deviceListTwo.setData(selectedPlatform);
+                userQuery = false;
             }
         }
     });
