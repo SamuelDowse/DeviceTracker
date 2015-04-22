@@ -1,5 +1,6 @@
 function obtainAll(){
     platforms = []; devices = [];
+    searchBar.setValue('Refreshing Device List!');
     deviceFunctions.call('GET', 'objects/Platforms/query', {'order':'-platform'}, function(err, data){
         var numberOfPlatforms = data.response.Platforms;
         var platformCount = 0;
@@ -191,7 +192,6 @@ function beginMobileWeb(){
     });
     
     appcLogo.addEventListener('click', function(){
-        searchBar.setValue('Refreshing device list!');
         deviceListTwo.setData([]);
         cameraWin.remove(deviceWindow);
         cameraWin.remove(menuBar);

@@ -47,9 +47,8 @@ var closeDeviceWin = function() {
 function setActionListeners(){
     login.addEventListener('singletap', function() {
         if (!loggedIn){
-            if (Ti.Platform.osname == 'android'){
+            if (Ti.Platform.osname == 'android')
                 cameraWin.addEventListener('androidback', closeDeviceWin);
-            }
             userLog.logIn();
         } else {
             userLog.logOut();	      	
@@ -57,26 +56,21 @@ function setActionListeners(){
     });
     
     checkout.addEventListener('singletap', function() {
-        uniqueDevices = scannedDevices.filter(function(elem, pos) {
-            return scannedDevices.indexOf(elem) == pos;
-        });
-        scanned = false;
-        if (Ti.Platform.osname == 'android'){
-            cameraWin.activity.invalidateOptionsMenu();
-        }
+        uniqueDevices = scannedDevices.filter(function(elem, pos) { return scannedDevices.indexOf(elem) == pos; });
         loggedIn ? deviceFunctions.checkoutDeviceLoggedIn() : deviceFunctions.checkoutDeviceNotLoggedIn();
-        if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
-            cameraWin.setRightNavButton(blank);
-        }
+        scanned = false;
+        if (Ti.Platform.osname == 'android')
+        	cameraWin.activity.invalidateOptionsMenu();
+        if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
+        	cameraWin.setRightNavButton(blank);
         scannedDevices = [];
         uniqueDevices = [];
         scannedUsers = [];
     });
     
     clear.addEventListener('singletap', function(){
-        if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
+        if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad')
             cameraWin.setRightNavButton(blank);
-        }
         scannedDevices = [];
         uniqueDevices = [];
         scannedUsers = [];
