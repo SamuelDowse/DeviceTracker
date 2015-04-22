@@ -162,8 +162,9 @@ newWindow.add(companyNameInput);
 newWindow.add(saveCompany);
 //--NEW DEVICE WINDOW--\\
 
-// Set action listeners for the scanner file
+// Set action listeners
 scannerFile.setActionListeners();
+userLog.loginListeners();
 
 // Check the users device and load the correct UI
 switch(Ti.Platform.osname){

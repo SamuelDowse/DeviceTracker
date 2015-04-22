@@ -1,16 +1,5 @@
-/**
- * Open a window to allow the user to input their log in details.
- * If the log in details are correct, close the log in window.
- * If the log in details are incorrect, display an error message.
- */
-function logIn(){
-    loginPage = true;
-    userName.setValue(null);
-    userPassword.setValue(null);
-    scannerFile.closeScanner();
-    cameraWin.add(loginWindow);
-    
-    loginButton.addEventListener("click", function() {
+function loginListeners(){
+	loginButton.addEventListener("click", function() {
         Cloud.Users.login({
             login: userName.value,
             password: userPassword.value
@@ -42,26 +31,38 @@ function logIn(){
 }
 
 /**
+ * Open a window to allow the user to input their log in details.
+ * If the log in details are correct, close the log in window.
+ * If the log in details are incorrect, display an error message.
+ */
+function logIn(){
+    loginPage = true;
+    userName.setValue(null);
+    userPassword.setValue(null);
+    scannerFile.closeScanner();
+    cameraWin.add(loginWindow);
+}
+
+/**
  * If a user is logged in and this method is called, log them out.
  * If a user is not logged in and this method is called, do nothing.
  */
 function logOut(){
-    if (loggedIn == true){
-        Cloud.Users.logout(function (e) {
-            if (e.success) {
-                login.setBackgroundImage('assets/login.png');
-                loggedIn = false;
-                admin = false;
-                currentUser = null;
-                if (Ti.Platform.osname == 'android'){
-                    cameraWin.activity.invalidateOptionsMenu();
-                }
-            } else {
-                alert('Failed to log out user!');
+    Cloud.Users.logout(function (e) {
+        if (e.success) {
+            login.setBackgroundImage('assets/login.png');
+            loggedIn = false;
+            admin = false;
+            currentUser = null;
+            if (Ti.Platform.osname == 'android'){
+                cameraWin.activity.invalidateOptionsMenu();
             }
-        });
-    }
+        } else {
+            alert('Failed to log out user!');
+        }
+    });
 }
 
 exports.logIn = logIn;
 exports.logOut = logOut;
+exports.loginListeners = loginListeners;
