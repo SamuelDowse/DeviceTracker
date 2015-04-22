@@ -65,6 +65,12 @@ function setActionListeners(){
             cameraWin.activity.invalidateOptionsMenu();
         }
         loggedIn ? deviceFunctions.checkoutDeviceLoggedIn() : deviceFunctions.checkoutDeviceNotLoggedIn();
+        if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
+            cameraWin.setRightNavButton(blank);
+        }
+        scannedDevices = [];
+        uniqueDevices = [];
+        scannedUsers = [];
     });
     
     clear.addEventListener('singletap', function(){
