@@ -95,9 +95,11 @@ function setActionListeners(){
         devices = [];
         platforms = [];
         uniquePlatforms = [];
-        if (companyName != "AppceleratorRocks!"){
-        	deviceFunctions.getPlatforms();
-        	deviceFunctions.getDevices();
+        if (Ti.Platform.osname == 'android') {
+        	if (companyName != "AppceleratorRocks!"){
+        		deviceFunctions.getPlatforms();
+        		deviceFunctions.getDevices();
+        	}
         }
     });
 }
