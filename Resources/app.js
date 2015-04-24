@@ -83,6 +83,8 @@ var platformToRemove;
 // GLOBAL VARIABLES \\
 
 // OS SPECIFIC VARIABLES \\
+var unlinkDialog        = Ti.UI.createAlertDialog();
+
 var add                 = Ti.UI.createButton({title:'Add', color:'white', backgroundImage:'none'});
 var backToCamera        = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});
 var backToDevice        = Ti.UI.createButton({title:'Back', color:'white', backgroundImage:'none'});

@@ -68,7 +68,7 @@ function checkoutDeviceLoggedIn(){
                         fields:{ taken_by:userIDString }
                     }, function (e){
                         if (e.success) {
-                            var unlinkDialog = Ti.UI.createAlertDialog({ message: stringMessage });
+                            unlinkDialog.setMessage(stringMessage);
                             unlinkDialog.show();
                         } else {
                             Ti.API.error('Failed to unlink '+errorMessage);
@@ -77,11 +77,9 @@ function checkoutDeviceLoggedIn(){
                 }
             }
         }
+        scannedDevices = [];
         uniqueDevices = [];
-    	scannedDevices = [];
-    	scannedUsers = [];
-    	uniqueDevices = [];
-    	getPlatforms();
+        scannedUsers = [];
     	getDevices();
     }
 }
@@ -116,7 +114,7 @@ function checkoutDeviceNotLoggedIn(){
                                         fields:{taken_by:userIDString}
                                     }, function (e){
                                         if (e.success) {
-                                            var unlinkDialog = Ti.UI.createAlertDialog({ message: stringMessage });
+                                            unlinkDialog.setMessage(stringMessage);
                                             unlinkDialog.show();
                                         } else {
                                             Ti.API.error('Failed to unlink '+errorMessage);
@@ -139,7 +137,7 @@ function checkoutDeviceNotLoggedIn(){
                                 fields:{ taken_by:null }
                             }, function (e){
                                 if (e.success) {
-                                    var unlinkDialog = Ti.UI.createAlertDialog({ message: 'Removing users from device' });
+                                	unlinkDialog.setMessage('Removing users from device');
                                     unlinkDialog.show();
                                 } else {
                                     Ti.API.error('Failed to unlink '+currentDevice.model+' ('+currentDevice.platform+') from all users');
