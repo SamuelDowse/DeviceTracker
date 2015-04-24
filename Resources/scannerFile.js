@@ -95,10 +95,13 @@ function setActionListeners(){
     });
     
     cameraWin.addEventListener('focus', function(){
-    	if (companyName != "AppceleratorRocks!"){
-    		deviceFunctions.getPlatforms();
-    		deviceFunctions.getDevices();
-    	}
+    	if (!currentlyRefreshing){
+	    	if (companyName != "AppceleratorRocks!"){
+	    		currentlyRefreshing = true;
+	    		deviceFunctions.getPlatforms();
+	    		deviceFunctions.getDevices();
+	    	}
+	    }
     });
 }
     

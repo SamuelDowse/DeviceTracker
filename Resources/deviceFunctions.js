@@ -259,7 +259,8 @@ function getDevices() {
                         color:'white'
                     });
                 }
-            }            
+            }
+            currentlyRefreshing = false;            
         });
     }
 }

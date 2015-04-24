@@ -108,6 +108,7 @@ var confirmInput        = Ti.UI.createTextField({width:'90%', top:'14%', backgro
 var adminInput          = Ti.UI.createSwitch({left:'5%', top:'13%', value:false}); 
 
 var addPage             = false;
+var currentlyRefreshing = false;
 var devicePage          = false;
 var editPage            = false;
 var listPage            = false;
