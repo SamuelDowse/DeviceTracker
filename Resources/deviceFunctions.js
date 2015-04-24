@@ -73,11 +73,16 @@ function checkoutDeviceLoggedIn(){
                         } else {
                             Ti.API.error('Failed to unlink '+errorMessage);
                         }
-                        clearAll();
                     });
                 }
             }
         }
+        uniqueDevices = [];
+    	scannedDevices = [];
+    	scannedUsers = [];
+    	uniqueDevices = [];
+    	getPlatforms();
+    	getDevices();
     }
 }
 
@@ -147,15 +152,6 @@ function checkoutDeviceNotLoggedIn(){
             }
         }
     });
-}
-
-function clearAll(){
-	uniqueDevices = [];
-    scannedDevices = [];
-    scannedUsers = [];
-    uniqueDevices = [];
-    getPlatforms();
-    getDevices();
 }
 
 function deleteDevice(){
