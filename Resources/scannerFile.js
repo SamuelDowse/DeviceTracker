@@ -95,15 +95,10 @@ function setActionListeners(){
     });
     
     cameraWin.addEventListener('focus', function(){
-        devices = [];
-        platforms = [];
-        uniquePlatforms = [];
-        if (Ti.Platform.osname == 'android') {
-        	if (companyName != "AppceleratorRocks!"){
-        		deviceFunctions.getPlatforms();
-        		deviceFunctions.getDevices();
-        	}
-        }
+    	if (companyName != "AppceleratorRocks!"){
+    		deviceFunctions.getPlatforms();
+    		deviceFunctions.getDevices();
+    	}
     });
 }
     
