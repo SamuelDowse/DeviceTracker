@@ -54,55 +54,34 @@ function checkoutDeviceLoggedIn(){
             for (b = 0; b < devices.length; b++){
                 if (devices[b].imei == uniqueDevices[a]){
                     currentDevice = devices[b];
-                    var messageOne = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform;
-                    var messageTwo = currentUser.first_name+' '+currentUser.last_name;
-                    var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+currentUser.first_name+' '+currentUser.last_name;
-                    switch (currentDevice.taken_by){
-                        case currentUser.id:
-                            Cloud.Objects.update({
-                                classname:'Device',
-                                id:currentDevice.id,
-                                fields:{
-                                    taken_by:null
-                                }
-                            }, function (e){
-                                if (e.success) {
-                                    var unlinkDialog = Ti.UI.createAlertDialog({
-                                        message: 'Unl'+messageOne+')\nfrom:\n'+messageTwo
-                                    });
-                                    unlinkDialog.show();
-                                } else {
-                                    Ti.API.error('Failed to unlink '+errorMessage);
-                                }
-                            });
-                            break;
-                        default:
-                            Cloud.Objects.update({
-                                classname:'Device',
-                                id:currentDevice.id,
-                                fields:{
-                                    taken_by:currentUser.id
-                                }
-                            }, function (e){
-                                if (e.success) {
-                                    var linkDialog = Ti.UI.createAlertDialog({
-                                        message: 'L'+messageOne+')\nto:\n'+messageTwo
-                                    });
-                                    linkDialog.show();
-                                } else {
-                                    Ti.API.error('Failed to link '+errorMessage);
-                                }
-                            });
-                            break;
+                    if (currentDevice.taken_by == currentUser.id){
+                    	var userIDString = null;
+                    	var stringMessage = 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name;
+                    } else {
+                    	var userIDString = currentUser.id;
+                    	var stringMessage = 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+currentUser.first_name+' '+currentUser.last_name;
                     }
+                    var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+currentUser.first_name+' '+currentUser.last_name; 
+                    Cloud.Objects.update({
+                        classname:'Device',
+                        id:currentDevice.id,
+                        fields:{ taken_by:userIDString }
+                    }, function (e){
+                        if (e.success) {
+                            var unlinkDialog = Ti.UI.createAlertDialog({ message: stringMessage });
+                            unlinkDialog.show();
+                        } else {
+                            Ti.API.error('Failed to unlink '+errorMessage);
+                        }
+                        clearAll();
+                    });
                 }
             }
         }
-        uniqueDevices = []; getPlatforms(); getDevices();
     }
 }
 
-function checkoutDeviceNotLoggedIn() {
+function checkoutDeviceNotLoggedIn(){
     Cloud.Users.login({
         login:'assigner',
         password:'tester'
@@ -110,9 +89,7 @@ function checkoutDeviceNotLoggedIn() {
         if (a.success){
             if (scannedUsers.length != 0){
                 Cloud.Users.query({
-                    where:{
-                        id:scannedUsers[0]
-                    }
+                    where:{ id:scannedUsers[0] }
                 }, function(b){
                     if (b.success){
                         var foundUser = b.users[0];
@@ -120,49 +97,27 @@ function checkoutDeviceNotLoggedIn() {
                             for (b = 0; b < devices.length; b++){
                                 if (devices[b].imei == uniqueDevices[a]){
                                     currentDevice = devices[b];
-                                    var messageOne = 'inking Device:\n'+currentDevice.model+' ('+currentDevice.platform;
-                                    var messageTwo = foundUser.first_name+' '+foundUser.last_name;
-                                    var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+foundUser.first_name+' '+foundUser.last_name;
-                                    switch (currentDevice.taken_by){
-                                        case foundUser.id:
-                                            Cloud.Objects.update({
-                                                classname:'Device',
-                                                id:currentDevice.id,
-                                                fields:{
-                                                    taken_by:null
-                                                }
-                                            }, function (e){
-                                                if (e.success) {
-                                                    var unlinkDialog = Ti.UI.createAlertDialog({
-                                                        message: 'Unl'+messageOne+')\nfrom:\n'+messageTwo
-                                                    });
-                                                    unlinkDialog.show();
-                                                } else {
-                                                    Ti.API.error('Failed to unlink '+errorMessage);
-                                                }
-                                                logOutAssigner();
-                                            });
-                                            break;
-                                        default:
-                                            Cloud.Objects.update({
-                                                classname:'Device',
-                                                id:currentDevice.id,
-                                                fields:{
-                                                    taken_by:foundUser.id
-                                                }
-                                            }, function (e){
-                                                if (e.success) {
-                                                    var linkDialog = Ti.UI.createAlertDialog({
-                                                        message: 'L'+messageOne+')\nto:\n'+messageTwo
-                                                    });
-                                                    linkDialog.show();
-                                                } else {
-                                                    Ti.API.error('Failed to link '+errorMessage);
-                                                }
-                                                logOutAssigner();
-                                            });
-                                            break;
+                                    if (currentDevice.taken_by == foundUser.id){
+                                    	var userIDString = null;
+                                    	var stringMessage = 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+foundUser.first_name+' '+foundUser.last_name;
+                                    } else {
+                                    	var userIDString = foundUser.id;
+                                    	var stringMessage = 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+foundUser.first_name+' '+foundUser.last_name;
                                     }
+                                    var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+foundUser.first_name+' '+foundUser.last_name;
+                                    Cloud.Objects.update({
+                                        classname:'Device',
+                                        id:currentDevice.id,
+                                        fields:{taken_by:userIDString}
+                                    }, function (e){
+                                        if (e.success) {
+                                            var unlinkDialog = Ti.UI.createAlertDialog({ message: stringMessage });
+                                            unlinkDialog.show();
+                                        } else {
+                                            Ti.API.error('Failed to unlink '+errorMessage);
+                                        }
+                                        logOutAssigner();
+                                    });
                                 }
                             }
                         }
@@ -176,14 +131,10 @@ function checkoutDeviceNotLoggedIn() {
                             Cloud.Objects.update({
                                 classname:'Device',
                                 id:currentDevice.id,
-                                fields:{
-                                    taken_by:null
-                                }
+                                fields:{ taken_by:null }
                             }, function (e){
                                 if (e.success) {
-                                    var unlinkDialog = Ti.UI.createAlertDialog({
-                                        message: 'Removing users from device'
-                                    });
+                                    var unlinkDialog = Ti.UI.createAlertDialog({ message: 'Removing users from device' });
                                     unlinkDialog.show();
                                 } else {
                                     Ti.API.error('Failed to unlink '+currentDevice.model+' ('+currentDevice.platform+') from all users');
@@ -196,6 +147,15 @@ function checkoutDeviceNotLoggedIn() {
             }
         }
     });
+}
+
+function clearAll(){
+	uniqueDevices = [];
+    scannedDevices = [];
+    scannedUsers = [];
+    uniqueDevices = [];
+    getPlatforms();
+    getDevices();
 }
 
 function deleteDevice(){
