@@ -79,7 +79,6 @@ function checkoutDeviceLoggedIn(){
     }
     uniqueDevices = [];
     scannedUsers = [];
-	getDevices();
 }
 
 function checkoutDeviceNotLoggedIn(){

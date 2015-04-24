@@ -78,6 +78,9 @@ function setActionListeners(){
     });
     
     listDevice.addEventListener('singletap', function() {
+    	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
+    		deviceFunctions.getDevices();
+    	}
         deviceList.setData(platforms);
         deviceWin.add(deviceList);
         cameraWin.add(deviceWin);
