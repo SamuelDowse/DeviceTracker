@@ -86,6 +86,11 @@ function setActionListeners(){
             cameraWin.activity.invalidateOptionsMenu();
         } else {
             cameraWin.setLeftNavButton(backToCamera);
+            if(admin){
+                cameraWin.setRightNavButton(add);
+            } else {
+                cameraWin.setRightNavButton(blank);
+            }
         }
         listPage = true;
         closeScanner();
