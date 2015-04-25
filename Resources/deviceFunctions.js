@@ -442,15 +442,14 @@ function uploadDevice(){
             order:'platform',
             limit:1000,
             where:{
+            	platform:devicePlatformValue.value,
                 companyName:companyName
             }
         }, function (e){
             for (var i = 0; i < e.Platforms.length; i++) {
-                if (devicePlatformValue.value == e.Platforms[i].platform){
-                    foundPlatform++;
-                }
+                foundPlatform++;
             }
-            if(foundPlatform = 0){
+            if(foundPlatform <= 0){
                 Cloud.Objects.create({
                     classname:'Platforms',
                     acl_name:'AllAccess',
