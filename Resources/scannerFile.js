@@ -52,7 +52,7 @@ function setActionListeners(){
             }
             userLog.logIn();
         } else {
-            userLog.logOut();	      	
+            userLog.logOut();              
         }
     });
     
@@ -61,10 +61,10 @@ function setActionListeners(){
         loggedIn ? deviceFunctions.checkoutDeviceLoggedIn() : deviceFunctions.checkoutDeviceNotLoggedIn();
         scanned = false;
         if (Ti.Platform.osname == 'android'){
-        	cameraWin.activity.invalidateOptionsMenu();
+            cameraWin.activity.invalidateOptionsMenu();
         }
         if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
-        	cameraWin.setRightNavButton(blank);
+            cameraWin.setRightNavButton(blank);
         }
     });
     
@@ -78,9 +78,6 @@ function setActionListeners(){
     });
     
     listDevice.addEventListener('singletap', function() {
-    	if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
-    		deviceFunctions.getDevices();
-    	}
         deviceList.setData(platforms);
         deviceWin.add(deviceList);
         cameraWin.add(deviceWin);
@@ -95,13 +92,13 @@ function setActionListeners(){
     });
     
     cameraWin.addEventListener('focus', function(){
-    	if (!currentlyRefreshing){
-	    	if (companyName != "AppceleratorRocks!"){
-	    		currentlyRefreshing = true;
-	    		deviceFunctions.getPlatforms();
-	    		deviceFunctions.getDevices();
-	    	}
-	    }
+        if (!currentlyRefreshing){
+            if (companyName != "AppceleratorRocks!"){
+                currentlyRefreshing = true;
+                deviceFunctions.getPlatforms();
+                deviceFunctions.getDevices();
+            }
+        }
     });
 }
     

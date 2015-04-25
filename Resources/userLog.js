@@ -1,5 +1,5 @@
 function loginListeners(){
-	loginButton.addEventListener("click", function() {
+    loginButton.addEventListener("click", function() {
         Cloud.Users.login({
             login: userName.value,
             password: userPassword.value

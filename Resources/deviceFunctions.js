@@ -49,17 +49,17 @@ function call(method, url, data, callback){
 }
 
 function checkoutDeviceLoggedIn(){
-	scannedDevices = [];
+    scannedDevices = [];
     for (var a = 0; a < uniqueDevices.length; a++){
         for (b = 0; b < devices.length; b++){
             if (devices[b].imei == uniqueDevices[a]){
                 currentDevice = devices[b];
                 if (currentDevice.taken_by == currentUser.id){
-                	var userIDString = null;
-                	var stringMessage = 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name;
+                    var userIDString = null;
+                    var stringMessage = 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+currentUser.first_name+' '+currentUser.last_name;
                 } else {
-                	var userIDString = currentUser.id;
-                	var stringMessage = 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+currentUser.first_name+' '+currentUser.last_name;
+                    var userIDString = currentUser.id;
+                    var stringMessage = 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+currentUser.first_name+' '+currentUser.last_name;
                 }
                 var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+currentUser.first_name+' '+currentUser.last_name; 
                 Cloud.Objects.update({
@@ -98,11 +98,11 @@ function checkoutDeviceNotLoggedIn(){
                                 if (devices[b].imei == uniqueDevices[a]){
                                     currentDevice = devices[b];
                                     if (currentDevice.taken_by == foundUser.id){
-                                    	var userIDString = null;
-                                    	var stringMessage = 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+foundUser.first_name+' '+foundUser.last_name;
+                                        var userIDString = null;
+                                        var stringMessage = 'Unlinking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nfrom:\n'+foundUser.first_name+' '+foundUser.last_name;
                                     } else {
-                                    	var userIDString = foundUser.id;
-                                    	var stringMessage = 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+foundUser.first_name+' '+foundUser.last_name;
+                                        var userIDString = foundUser.id;
+                                        var stringMessage = 'Linking Device:\n'+currentDevice.model+' ('+currentDevice.platform+')\nto:\n'+foundUser.first_name+' '+foundUser.last_name;
                                     }
                                     var errorMessage = currentDevice.model+' ('+currentDevice.platform+') from '+foundUser.first_name+' '+foundUser.last_name;
                                     Cloud.Objects.update({
@@ -134,7 +134,7 @@ function checkoutDeviceNotLoggedIn(){
                                 fields:{ taken_by:null }
                             }, function (e){
                                 if (e.success) {
-                                	unlinkDialog.setMessage('Removing users from device');
+                                    unlinkDialog.setMessage('Removing users from device');
                                     unlinkDialog.show();
                                 } else {
                                     Ti.API.error('Failed to unlink '+currentDevice.model+' ('+currentDevice.platform+') from all users');
@@ -162,7 +162,11 @@ function deleteDevice(){
                     cameraWin.setLeftNavButton(backToPlatforms);
                     cameraWin.setRightNavButton(blank);
                 }
-                getPlatforms();
+                if (!currentlyRefreshing){
+                    currentlyRefreshing = true;
+                    getPlatforms();
+                    getDevices();
+                }
             } else {
                 Ti.API.error('Failed to remove device');
             }
@@ -273,8 +277,11 @@ function logOutAssigner(){
             scannedDevices = [];
             scannedUsers = [];
             uniqueDevices = [];
-            getPlatforms();
-            getDevices();
+            if(!currentlyRefreshing){
+                currentlyRefreshing = true;
+                getPlatforms();
+                getDevices();
+            }
         } else {
             Ti.API.error('Failed to log out of the assigner account');
         }

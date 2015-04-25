@@ -204,14 +204,19 @@ function obtainAll(){
     if (Ti.Platform.osname == 'mobileweb'){
         mobileWebSetUp.obtainAll();
     } else {
-        deviceFunctions.getPlatforms();
-        deviceFunctions.getDevices();
+        if(!currentlyRefreshing){
+            currentlyRefreshing = true;
+            deviceFunctions.getPlatforms();
+            deviceFunctions.getDevices();
+        }
     }
 }
 
 var companyName = Ti.App.Properties.getString('companyName', 'AppceleratorRocks!');
-if (companyName == 'AppceleratorRocks!'){
-    cameraWin.add(newWindow);
+if (companyName != 'AppceleratorRocks!'){
+    obtainAll();
+} else {
+  cameraWin.add(newWindow);
     saveCompany.addEventListener('return', function(){
         companyName = companyNameInput.value;
         Ti.App.Properties.setString('companyName', companyNameInput.value);
@@ -224,6 +229,4 @@ if (companyName == 'AppceleratorRocks!'){
         obtainAll();
         cameraWin.remove(newWindow);
     });
-} else {
-    obtainAll();
 }

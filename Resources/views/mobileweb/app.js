@@ -106,13 +106,13 @@ function uploadUser(){
 }
 
 function queryUsers(){
-	deviceFunctions.call('GET', 'users/query', {
-		'order':'username',
-	}, function(err, data){
-		var usersFound = [];
-		var numberOfUsers = data.response.users;
-		for (var a = 0; a < numberOfUsers.length; a++){
-		    if (data.response.users[a].role == companyName)
+    deviceFunctions.call('GET', 'users/query', {
+        'order':'username',
+    }, function(err, data){
+        var usersFound = [];
+        var numberOfUsers = data.response.users;
+        for (var a = 0; a < numberOfUsers.length; a++){
+            if (data.response.users[a].role == companyName)
                 usersFound.push({
                     title:data.response.users[a].username,
                     id:data.response.users[a].id
@@ -256,9 +256,9 @@ function beginMobileWeb(){
     });
     
     queryUser.addEventListener('click', function(){
-    	searchBar.setValue('Obtaining Users!');
-    	cameraWin.remove(menuBar);
-    	cameraWin.remove(deviceWindow);
+        searchBar.setValue('Obtaining Users!');
+        cameraWin.remove(menuBar);
+        cameraWin.remove(deviceWindow);
         alternateDrop = false;
         queryUsers();
     });
@@ -295,61 +295,61 @@ function beginMobileWeb(){
     
     deviceListTwo.addEventListener('click', function(e){
         if (e.rowData != null){
-        	if (userQuery == true){
-        		deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.id+'","object":"user"}');
-        		deviceInfo.setText('User: '+e.rowData.title);
-        		cameraWin.add(deviceWindow);
-        	} else {
-	            if (searchBar.value.indexOf('Results found') > -1){
-	                searchBar.setValue('');
-	            }
-	            var message = e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei;
-	            if (e.rowData.takenBy != undefined){
-		            deviceFunctions.call('GET', 'users/query', {where:{ id:e.rowData.takenBy }}, function(err, data){
-	                    var obtainedData = data.response;
-	                    var takenByID = e.rowData.takenBy;
-	                    deviceInfo.setText(message+'\nTaken By: '+obtainedData.users[0].first_name+' '+obtainedData.users[0].last_name);
-	                });
-	            } else {
-		            var takenByID = null;
-	                deviceInfo.setText(message+'\nNot In Use');
-	            }
-	            deviceFunctions.call('GET', 'users/query', {where:{ id:takenByID }}, function(err, data){
-	                var test = data.response;
-	                if (e.rowData.image == null){
-	                    deviceImageURL = 'assets/nodevice.png';
-	                } else {
-	                    if (Ti.Platform.displayCaps.platformWidth > 0 && Ti.Platform.displayCaps.platformWidth < 240){
-	                        deviceImageURL = e.rowData.image.urls['thumb_100'];
-	                    } else if (Ti.Platform.displayCaps.platformWidth > 241 && Ti.Platform.displayCaps.platformWidth < 500){
-	                        deviceImageURL = e.rowData.image.urls['small_240'];
-	                    } else if (Ti.Platform.displayCaps.platformWidth > 501 && Ti.Platform.displayCaps.platformWidth < 640){
-	                        deviceImageURL = e.rowData.image.urls['medium_500'];
-	                    } else if (Ti.Platform.displayCaps.platformWidth > 641 && Ti.Platform.displayCaps.platformWidth < 1024){
-	                        deviceImageURL = e.rowData.image.urls['medium_640'];
-	                    } else if (Ti.Platform.displayCaps.platformWidth > 1025){
-	                        deviceImageURL = e.rowData.image.urls['large_1024'];
-	                    }
-	                }
-	            	deviceImage.setImage(deviceImageURL);
-	                devicePlatformValue.setValue(e.rowData.platform);
-	                deviceOSValue.setValue(e.rowData.osver);
-	                deviceModelValue.setValue(e.rowData.model);
-	                deviceNameValue.setValue(e.rowData.name);
-	                deviceIMEIValue.setValue(e.rowData.imei);
-	                deviceIDValue = e.rowData.id;
-	                var alternateImage = false;
-	                deviceImage.addEventListener('dblclick', function(){
-	                    if(alternateImage == false){
-	                        deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.imei+'","object":"device"}');
-	                    } else {
-	                        deviceImage.setImage(deviceImageURL);
-	                    }
-	                    alternateImage = !alternateImage;
-	                });
-	            cameraWin.add(deviceWindow);
-	            });
-	        }
+            if (userQuery == true){
+                deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.id+'","object":"user"}');
+                deviceInfo.setText('User: '+e.rowData.title);
+                cameraWin.add(deviceWindow);
+            } else {
+                if (searchBar.value.indexOf('Results found') > -1){
+                    searchBar.setValue('');
+                }
+                var message = e.rowData.platform+' ('+e.rowData.osver+')\n'+e.rowData.model+'\n'+e.rowData.name+'\n'+e.rowData.imei;
+                if (e.rowData.takenBy != undefined){
+                    deviceFunctions.call('GET', 'users/query', {where:{ id:e.rowData.takenBy }}, function(err, data){
+                        var obtainedData = data.response;
+                        var takenByID = e.rowData.takenBy;
+                        deviceInfo.setText(message+'\nTaken By: '+obtainedData.users[0].first_name+' '+obtainedData.users[0].last_name);
+                    });
+                } else {
+                    var takenByID = null;
+                    deviceInfo.setText(message+'\nNot In Use');
+                }
+                deviceFunctions.call('GET', 'users/query', {where:{ id:takenByID }}, function(err, data){
+                    var test = data.response;
+                    if (e.rowData.image == null){
+                        deviceImageURL = 'assets/nodevice.png';
+                    } else {
+                        if (Ti.Platform.displayCaps.platformWidth > 0 && Ti.Platform.displayCaps.platformWidth < 240){
+                            deviceImageURL = e.rowData.image.urls['thumb_100'];
+                        } else if (Ti.Platform.displayCaps.platformWidth > 241 && Ti.Platform.displayCaps.platformWidth < 500){
+                            deviceImageURL = e.rowData.image.urls['small_240'];
+                        } else if (Ti.Platform.displayCaps.platformWidth > 501 && Ti.Platform.displayCaps.platformWidth < 640){
+                            deviceImageURL = e.rowData.image.urls['medium_500'];
+                        } else if (Ti.Platform.displayCaps.platformWidth > 641 && Ti.Platform.displayCaps.platformWidth < 1024){
+                            deviceImageURL = e.rowData.image.urls['medium_640'];
+                        } else if (Ti.Platform.displayCaps.platformWidth > 1025){
+                            deviceImageURL = e.rowData.image.urls['large_1024'];
+                        }
+                    }
+                    deviceImage.setImage(deviceImageURL);
+                    devicePlatformValue.setValue(e.rowData.platform);
+                    deviceOSValue.setValue(e.rowData.osver);
+                    deviceModelValue.setValue(e.rowData.model);
+                    deviceNameValue.setValue(e.rowData.name);
+                    deviceIMEIValue.setValue(e.rowData.imei);
+                    deviceIDValue = e.rowData.id;
+                    var alternateImage = false;
+                    deviceImage.addEventListener('dblclick', function(){
+                        if(alternateImage == false){
+                            deviceImage.setImage('https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={"id":"'+e.rowData.imei+'","object":"device"}');
+                        } else {
+                            deviceImage.setImage(deviceImageURL);
+                        }
+                        alternateImage = !alternateImage;
+                    });
+                cameraWin.add(deviceWindow);
+                });
+            }
         }
     });
 }
