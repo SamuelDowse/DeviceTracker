@@ -22,6 +22,9 @@ var login               = Ti.UI.createButton({backgroundImage:'assets/login.png'
 var loginButton         = Ti.UI.createButton({title:"Log In", top:30, color:'white'});
 var takePhoto           = Ti.UI.createButton({title:'Take Photo of Device', top:15, font:{fontSize:18}});
 
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')
+    var control         = Ti.UI.createRefreshControl({tintColor:'#B50D00'});
+
 var deviceImage         = Ti.UI.createImageView({top:20, bottom:20, height:'50%'});
 
 var deviceInfo          = Ti.UI.createLabel({font:{fontSize:18}, textAlign:Ti.UI.TEXT_ALIGNMENT_CENTER, top:'51%', height:'50%', color:'white'});
@@ -32,8 +35,11 @@ if (Ti.Platform.osname != 'mobileweb')
 if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')    
     var tabGroup        = Ti.UI.createTabGroup();
 
-var deviceList          = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
-var deviceListTwo       = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')
+    var deviceList      = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control});
+else
+    var deviceList      = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
+var deviceListTwo   = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
 
 var companyNameInput    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Company Name', color:'white'});
 var deviceIMEIValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI', color:'white'});
@@ -130,7 +136,17 @@ if(!Ti.Network.networkType != Ti.Network.NETWORK_NONE){
     });
     alertDialog.show();
 }
-
+if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone'){
+    control.addEventListener('refreshstart',function(e){
+        setTimeout(function(){
+            if(!currentlyRefreshing){
+                currentlyRefreshing = true;
+                deviceFunctions.getPlatforms();
+                deviceFunctions.getDevices();
+            }
+        }, 2000);
+    });
+}
 //--ADD DEVICE WINDOW--\\
 addWindow.add(devicePlatformValue);
 addWindow.add(deviceOSValue);
@@ -164,10 +180,6 @@ loginWindow.add(cancelButton);
 newWindow.add(companyNameInput);
 newWindow.add(saveCompany);
 //--NEW DEVICE WINDOW--\\
-
-// Set action listeners
-scannerFile.setActionListeners();
-userLog.loginListeners();
 
 // Check the users device and load the correct UI
 switch(Ti.Platform.osname){
@@ -209,6 +221,8 @@ function obtainAll(){
             deviceFunctions.getPlatforms();
             deviceFunctions.getDevices();
         }
+        scannerFile.setActionListeners();
+        userLog.loginListeners();
     }
 }
 
@@ -216,17 +230,21 @@ var companyName = Ti.App.Properties.getString('companyName', 'AppceleratorRocks!
 if (companyName != 'AppceleratorRocks!'){
     obtainAll();
 } else {
-  cameraWin.add(newWindow);
+    cameraWin.add(newWindow);
     saveCompany.addEventListener('return', function(){
         companyName = companyNameInput.value;
-        Ti.App.Properties.setString('companyName', companyNameInput.value);
-        obtainAll();
-        cameraWin.remove(newWindow);
+        if (companyName != ""){
+            Ti.App.Properties.setString('companyName', companyNameInput.value);
+            obtainAll();
+            cameraWin.remove(newWindow);
+        }
     });
     saveCompany.addEventListener('click', function(){
         companyName = companyNameInput.value;
-        Ti.App.Properties.setString('companyName', companyNameInput.value);
-        obtainAll();
-        cameraWin.remove(newWindow);
+        if (companyName != ""){
+            Ti.App.Properties.setString('companyName', companyNameInput.value);
+            obtainAll();
+            cameraWin.remove(newWindow);
+        }
     });
 }

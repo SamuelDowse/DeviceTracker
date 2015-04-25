@@ -70,6 +70,10 @@ function checkoutDeviceLoggedIn(){
                     if (e.success) {
                         unlinkDialog.setMessage(stringMessage);
                         unlinkDialog.show();
+                        if (!currentlyRefreshing){
+                            currentlyRefreshing = true;
+                            deviceFunctions.getDevices();
+                        }
                     } else {
                         Ti.API.error('Failed to unlink '+errorMessage);
                     }
