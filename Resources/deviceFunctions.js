@@ -2,17 +2,15 @@
  * Open the camera to let the user take a picture.
  */
 function addPicture(){
-    if (Ti.Platform.osname != 'mobileweb'){
-        Ti.Media.showCamera({
-            success:function(e){ photo = e.media; },
-            cancel:function(){ return; },
-            error:function(error){
-                var a = Ti.UI.createAlertDialog({ title:'Error Occurred' });
-                (error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Unable to connect to your camera!') : a.setMessage('Unexpected error: '+error.code);
-                a.show();
-            }
-        });
-    }
+    Ti.Media.showCamera({
+        success:function(e){ photo = e.media; },
+        cancel:function(){ return; },
+        error:function(error){
+            var a = Ti.UI.createAlertDialog({ title:'Error Occurred' });
+            (error.code = Ti.Media.NO_CAMERA) ? a.setMessage('Unable to connect to your camera!') : a.setMessage('Unexpected error: '+error.code);
+            a.show();
+        }
+    });
 }
 
 function call(method, url, data, callback){

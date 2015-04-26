@@ -154,7 +154,8 @@ addWindow.add(deviceModelValue);
 addWindow.add(deviceNameValue);
 addWindow.add(deviceIMEIValue);
 addWindow.add(takePhoto);
-addWindow.add(upload);
+if (Ti.Platform.osname == 'android')
+    addWindow.add(upload);
 //--ADD DEVICE WINDOW--\\
 //--DISPLAY DEVICE WINDOW--\\
 deviceWindow.add(deviceImage);
@@ -167,7 +168,8 @@ editWindow.add(deviceModelValue);
 editWindow.add(deviceNameValue);
 editWindow.add(deviceIMEIValue);
 editWindow.add(takePhoto);
-editWindow.add(save);
+if (Ti.Platform.osname == 'android')
+    editWindow.add(save);
 editWindow.add(deleteDevice);
 //--EDIT DEVICE WINDOW--\\
 //--LOGIN PAGE WINDOW--\\

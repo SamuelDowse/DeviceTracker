@@ -77,6 +77,7 @@ function beginiOS(){
     upload.addEventListener('singletap', function() {
         deviceFunctions.uploadDevice();
         scannerFile.openScanner();
+        cameraWin.setRightNavButton(blank);
     });
     
     deleteDevice.addEventListener('singletap', function() {
