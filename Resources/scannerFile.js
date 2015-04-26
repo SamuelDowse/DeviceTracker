@@ -104,6 +104,13 @@ function setActionListeners(){
                 deviceFunctions.getDevices();
             }
         }
+        if (Ti.Platform.osname == 'iphone' || Ti.Platform.osname == 'ipad'){
+            if (scannedDevices.length == 0 || scannedUsers.length == 0){
+                cameraWin.setRightNavButton(blank);
+            } else {
+                cameraWin.setRightNavButton(clear);
+            }
+        }
     });
 }
     
