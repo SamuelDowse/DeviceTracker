@@ -132,6 +132,7 @@ function beginMobileWeb(){
     var addUser       = Ti.UI.createButton({title:'Add User', color:'white', backgroundImage:'none', height:39, top:0});
     var createUser    = Ti.UI.createButton({title:'Create User', color:'white', backgroundColor:'#880015', borderRadius:1, borderWidth:2, borderColor:'#880015', top:'5%'});
     var queryUser     = Ti.UI.createButton({title:'Query User', color:'white', backgroundImage:'none', height:39, top:30});
+    var viewTaken     = Ti.UI.createButton({title:'View Taken', color:'white', backgroundImage:'none', height:39, top:62});
     
     var appcLogo      = Ti.UI.createImageView({image:'assets/logo.png', left:10});
     var close         = Ti.UI.createImageView({image:'assets/close.png', top:0, right:0});
@@ -139,7 +140,7 @@ function beginMobileWeb(){
     
     var addUserView   = Ti.UI.createView({backgroundColor:'#484850', width:'50%', height:'50%', borderRadius:1, borderWidth:3, borderColor:'#880015'});
     var dimUserView   = Ti.UI.createView({backgroundColor:'rgba(0,0,0,0.5)', width:'100%', height:'100%'});
-    var menuBar       = Ti.UI.createView({backgroundColor:'#242428', top:'5%', width:87, height:78, right:0, borderRadius:1, borderWidth:3, borderColor:'black'});
+    var menuBar       = Ti.UI.createView({backgroundColor:'#242428', top:'5%', width:90, height:110, right:0, borderRadius:1, borderWidth:3, borderColor:'black'});
     var seperator     = Ti.UI.createView({backgroundColor:'#242428', width:'3', right:0});
     var seperatorTwo  = Ti.UI.createView({backgroundColor:'#242428', width:'3', left:'30%'});
     var searchView    = Ti.UI.createView({backgroundColor:'#B50D00', width:'100%', height:'5%', top:0});
@@ -176,6 +177,8 @@ function beginMobileWeb(){
     deviceWindow.setHeight('95%');
     menuBar.add(addUser);
     menuBar.add(queryUser);
+    menuBar.add(viewTaken);
+    
     
     addUser.addEventListener('click', function(){
         cameraWin.remove(menuBar);
@@ -261,6 +264,20 @@ function beginMobileWeb(){
         cameraWin.remove(deviceWindow);
         alternateDrop = false;
         queryUsers();
+    });
+    
+    viewTaken.addEventListener('click', function(){
+    	var takenDevices = [];
+        for (var a = 0; a < devices.length; a++){
+            if (devices[a].takenBy != null){
+                takenDevices.push(devices[a]);
+            }
+        }
+        cameraWin.remove(menuBar);
+        cameraWin.remove(deviceWindow);
+        alternateDrop = false;
+        userQuery = false;
+        deviceListTwo.setData(takenDevices);
     });
 
     addUserView.add(titleBox);

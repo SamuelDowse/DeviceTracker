@@ -39,7 +39,7 @@ if (Ti.Platform.osname == 'ipad' || Ti.Platform.osname == 'iphone')
     var deviceList      = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white', refreshControl:control});
 else
     var deviceList      = Ti.UI.createTableView({data:platforms, search:search, backgroundColor:'#484850', color:'white'});
-var deviceListTwo   = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
+var deviceListTwo       = Ti.UI.createTableView({data:platforms, backgroundColor:'#484850', color:'white', width:'70%', height:'95%', right:0, bottom:0});
 
 var companyNameInput    = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'Company Name', color:'white'});
 var deviceIMEIValue     = Ti.UI.createTextField({font:{fontSize:18}, top:15, hintText:'IMEI', color:'white'});
